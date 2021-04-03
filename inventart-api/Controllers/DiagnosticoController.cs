@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,14 +34,22 @@ namespace Inventart.Controllers
         }
 
         [HttpGet("list")]
-        public IEnumerable<string> Get()
+        public async Task<IActionResult> Get()
         {
-            return new List<string>() { "1", "2"};
+            List<dynamic> results = new List<dynamic>();
+            var sql = "SELECT * FROM list_diagnostico()";
+            //
+            using (var connection = new NpgsqlConnection(_csp.ConnectionString))
+            {
+                results = connection.Query(sql).ToList();
+            }
+            return Ok(results);
         }
 
         [HttpPost("upload")]
         public async Task<IActionResult> OnPostUploadAsync([FromQuery]Guid diagnostico, IFormFile file)
         {
+            Guid? file_guid = null;
             long size = file.Length;
 
             if (file.Length > 0)
@@ -49,17 +58,18 @@ namespace Inventart.Controllers
                 {
                     await file.CopyToAsync(ms);
                     byte[] fileBytes = ms.ToArray();
-                    var x = 1;
                     // save to database
+                    DynamicParameters sp_params = new DynamicParameters(new { p_guid = diagnostico, p_name = file.FileName, p_bytes = fileBytes });
+                    sp_params.Add("@o_file_guid", value: null, DbType.Guid, direction: ParameterDirection.InputOutput);
+                    var sql = "CALL sp_upload_file_diagnostico(@p_guid, @p_name, @p_bytes, @o_file_guid)";
+                    //
                     using (var connection = new NpgsqlConnection(_csp.ConnectionString))
                     {
-                        var sql = "UPDATE diagnostico SET nxz_file = (@file) WHERE guid = (@guid)";
-                        if (1 == connection.Execute(sql, new { file = fileBytes, guid = diagnostico }))
-                        {
-                            // save to wwwroot if upload to database worked
-                            FileIO.WriteAllBytes(Path.Combine(_wenv.WebRootPath, "nxz", "db.nxz"), fileBytes);
-                        }
-                        //var cenas = connection.Query("SELECT * FROM test");
+                        connection.Execute(sql, sp_params);
+                        file_guid = sp_params.Get<Guid>("o_file_guid");
+                        // save to wwwroot if upload to database worked, future optimization after the non optimized process has been tested
+                        // when a file is requested for stream we will check the disk and only download form database if teh files are not already available
+                        //FileIO.WriteAllBytes(Path.Combine(_wenv.WebRootPath, "nxz", $"{file_guid}.nxz"), fileBytes);
                     }
                 }
             }
@@ -67,7 +77,7 @@ namespace Inventart.Controllers
             // Process uploaded files
             // Don't rely on or trust the FileName property without validation.
 
-            return Ok(new { count = 1, size });
+            return Ok(new { count = 1, size, file_guid });
         }
 
     }
