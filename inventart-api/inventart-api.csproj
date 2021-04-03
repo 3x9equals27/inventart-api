@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>inventart_api</RootNamespace>
+    <UserSecretsId>fe03c64d-a88f-4475-bb7d-5b3c61f5cc14</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
