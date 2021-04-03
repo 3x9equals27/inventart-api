@@ -4,10 +4,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
@@ -18,16 +20,29 @@ namespace Inventart
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+        private static string[] AllowedOrigins;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-        }
 
-        public IConfiguration Configuration { get; }
+            AllowedOrigins = Configuration.GetValue<string>("AllowedOrigins").Split(";");
+        }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins(AllowedOrigins)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                    });
+            });
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -59,12 +74,15 @@ namespace Inventart
 
             app.UseStaticFiles(new StaticFileOptions
             {
-                ServeUnknownFileTypes = true
+                ServeUnknownFileTypes = true,
+                OnPrepareResponse = AddCorsHeader
             });
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthorization();
 
@@ -73,5 +91,16 @@ namespace Inventart
                 endpoints.MapControllers();
             });
         }
+
+        private static void AddCorsHeader(StaticFileResponseContext obj)
+        {
+            StringValues origins = obj.Context.Request.Headers["Origin"];
+            string origin = origins.ToString();
+            if (AllowedOrigins.Contains(origin))
+            {
+                obj.Context.Response.Headers["Access-Control-Allow-Origin"] = origin;
+            }
+        }
+
     }
 }
