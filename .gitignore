@@ -350,3 +350,4 @@ MigrationBackup/
 .ionide/
 inventart-api/appsettings.Development.json
 inventart-api/wwwroot/nxz/
+inventart-api/wwwroot/models/
