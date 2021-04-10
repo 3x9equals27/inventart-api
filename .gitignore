@@ -351,3 +351,4 @@ MigrationBackup/
 inventart-api/appsettings.Development.json
 inventart-api/wwwroot/nxz/
 inventart-api/wwwroot/models/
+inventart-api/Properties/ServiceDependencies/

@@ -34,7 +34,7 @@ namespace Inventart.Controllers
             _csp = connectionStringProvider;
         }
 
-        [HttpGet("link")]
+        [HttpGet("link/{fileGuid}")]
         public async Task<IActionResult> GetLinkForFile(Guid fileGuid)
         {
             if(Guid.Empty == fileGuid) return BadRequest();
