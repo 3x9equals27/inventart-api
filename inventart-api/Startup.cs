@@ -1,5 +1,7 @@
 using Inventart.Config;
 using Inventart.Services.Singleton;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -13,7 +15,9 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Inventart
@@ -33,6 +37,21 @@ namespace Inventart
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //get the configs
+            var swag = Configuration.GetSection("SwaggerConfig").Get<SwaggerConfig>();
+            var auth0 = Configuration.GetSection("Auth0").Get<OAuthConfig>();
+
+            // 1. Add Authentication Services
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.Authority = auth0.Domain;
+                options.Audience = auth0.Audience;
+            });
+
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(
@@ -45,17 +64,61 @@ namespace Inventart
             });
 
             services.AddControllers();
+
+            // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "inventart_api", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "inventart-api",
+                    Version = "v1",
+                    Description = "inventart-api description"
+                });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+                c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme()
+                {
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows()
+                    {
+                        Implicit = new OpenApiOAuthFlow()
+                        {
+                            TokenUrl = new Uri(swag.ImplicitFlowTokenUrl),
+                            AuthorizationUrl = new Uri($"{swag.ImplicitFlowAuthorizationUrl}?audience={swag.OAuthAudience}"),
+                            Scopes = { }
+                        }
+                    }
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "oauth2"
+                            }
+                        },
+                        new List<string>()
+                    }
+                });
             });
 
-            //configuration
+            //AddAuthorization
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("file:upload", policy => policy.Requirements.Add(new HasScopeRequirement("file:upload", auth0.Domain)));
+            });
+
+            //injectable configuration
             services.Configure<PostgresConfig>(Configuration.GetSection("PostgreSQL"));
 
             //Singleton
             services.AddSingleton<ConnectionStringProvider>();
-
+            services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,9 +130,15 @@ namespace Inventart
            // }
 
             app.UseSwagger();
-            app.UseSwaggerUI(c => {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "inventart_api v1");
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            var swag = Configuration.GetSection("SwaggerConfig").Get<SwaggerConfig>();
+            app.UseSwaggerUI(c =>
+            {
                 c.RoutePrefix = "swagger";
+                c.SwaggerEndpoint(swag.EndpointUrl, swag.EndpointName);
+                c.OAuthClientId(swag.OAuthClientId);
+                c.OAuth2RedirectUrl(swag.OAuth2RedirectUrl);
+                c.OAuthScopeSeparator(swag.OAuthScopeSeparator);
             });
 
             app.UseStaticFiles(new StaticFileOptions
@@ -84,6 +153,7 @@ namespace Inventart
 
             app.UseCors();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

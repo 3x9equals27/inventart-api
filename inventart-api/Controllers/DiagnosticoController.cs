@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Inventart.Services.Singleton;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ using FileIO = System.IO.File;
 
 namespace Inventart.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class DiagnosticoController : ControllerBase
@@ -36,6 +38,8 @@ namespace Inventart.Controllers
         [HttpGet("list")]
         public async Task<IActionResult> Get()
         {
+            var x = Request.Headers["Authorization"];
+
             List<dynamic> results = new List<dynamic>();
             var sql = "SELECT * FROM list_diagnostico()";
             //
@@ -47,6 +51,7 @@ namespace Inventart.Controllers
         }
 
         [HttpPost("upload")]
+        [Authorize("file:upload")]
         public async Task<IActionResult> OnPostUploadAsync([FromQuery]Guid diagnostico, IFormFile file)
         {
             Guid? file_guid = null;

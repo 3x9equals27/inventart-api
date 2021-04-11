@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Inventart.Config;
 using Inventart.Services.Singleton;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,7 @@ using FileIO = System.IO.File;
 
 namespace Inventart.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class FileController : ControllerBase
