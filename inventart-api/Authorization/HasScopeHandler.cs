@@ -15,7 +15,7 @@ public class HasScopeHandler : AuthorizationHandler<HasScopeRequirement>
         var permissions = context.User.FindFirst(c => c.Type == "permissions" && c.Issuer == requirement.Issuer).Value.Split(' ');
         var role = permissions[0];
         // Succeed if the permissions array contains the required permission
-        if (Permission.Check(requirement.Permission, role))
+        if (PermissionManager.Check(requirement.Permission, role))
             context.Succeed(requirement);
 
         return Task.CompletedTask;
