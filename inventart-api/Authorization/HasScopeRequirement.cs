@@ -4,11 +4,11 @@ using System;
 public class HasScopeRequirement : IAuthorizationRequirement
 {
     public string Issuer { get; }
-    public string Scope { get; }
+    public string Permission { get; }
 
-    public HasScopeRequirement(string scope, string issuer)
+    public HasScopeRequirement(string permission, string issuer)
     {
-        Scope = scope ?? throw new ArgumentNullException(nameof(scope));
+        Permission = permission ?? throw new ArgumentNullException(nameof(permission));
         Issuer = issuer ?? throw new ArgumentNullException(nameof(issuer));
     }
 }

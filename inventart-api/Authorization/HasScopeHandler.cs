@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using inventart_api.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,9 +13,9 @@ public class HasScopeHandler : AuthorizationHandler<HasScopeRequirement>
 
         // Split the permissions string into an array
         var permissions = context.User.FindFirst(c => c.Type == "permissions" && c.Issuer == requirement.Issuer).Value.Split(' ');
-
+        var role = permissions[0];
         // Succeed if the permissions array contains the required permission
-        if (permissions.Any(s => s == requirement.Scope))
+        if (Permission.Check(requirement.Permission, role))
             context.Succeed(requirement);
 
         return Task.CompletedTask;

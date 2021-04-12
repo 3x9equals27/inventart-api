@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Inventart.Services.Singleton;
+using inventart_api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -36,6 +37,7 @@ namespace Inventart.Controllers
         }
 
         [HttpGet("list")]
+        [Authorize(Permission.ListDiagnostic)]
         public async Task<IActionResult> Get()
         {
             var x = Request.Headers["Authorization"];
@@ -45,13 +47,13 @@ namespace Inventart.Controllers
             //
             using (var connection = new NpgsqlConnection(_csp.ConnectionString))
             {
-                results = connection.Query(sql).ToList();
+                results = (await connection.QueryAsync(sql)).ToList();
             }
             return Ok(results);
         }
 
         [HttpPost("upload")]
-        [Authorize("file:upload")]
+        [Authorize(Permission.UploadFile)]
         public async Task<IActionResult> OnPostUploadAsync([FromQuery]Guid diagnostico, IFormFile file)
         {
             Guid? file_guid = null;

@@ -1,5 +1,6 @@
 using Inventart.Config;
 using Inventart.Services.Singleton;
+using inventart_api.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -110,7 +111,10 @@ namespace Inventart
             //AddAuthorization
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("file:upload", policy => policy.Requirements.Add(new HasScopeRequirement("file:upload", auth0.Domain)));
+                foreach(string permission in Permission.PermissionList)
+                {
+                    options.AddPolicy(permission, policy => policy.Requirements.Add(new HasScopeRequirement(permission, auth0.Domain)));
+                }
             });
 
             //injectable configuration
