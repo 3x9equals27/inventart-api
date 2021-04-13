@@ -113,7 +113,7 @@ namespace Inventart
             {
                 foreach(string permission in Permission.PermissionList)
                 {
-                    options.AddPolicy(permission, policy => policy.Requirements.Add(new HasScopeRequirement(permission, auth0.Domain)));
+                    options.AddPolicy(permission, policy => policy.Requirements.Add(new HasScopeRequirement(permission, auth0.Domain, auth0.Namespace)));
                 }
             });
 
