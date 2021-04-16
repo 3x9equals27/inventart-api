@@ -20,7 +20,14 @@ namespace Inventart
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>().UseKestrel(opts =>
+                    {
+                        // Bind directly to a socket handle or Unix socket
+                        //opts.ListenHandle(123554);
+                        //opts.ListenUnixSocket("/tmp/kestrel-test.sock");
+                        opts.ListenAnyIP(5000);
+                        opts.ListenAnyIP(5001, opts => opts.UseHttps());
+                    });
                 });
     }
 }
