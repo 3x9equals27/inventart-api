@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace inventart_api.Authorization
+namespace Inventart.Authorization
 {
     public static class PermissionManager
     {

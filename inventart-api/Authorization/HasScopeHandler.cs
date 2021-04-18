@@ -1,4 +1,4 @@
-﻿using inventart_api.Authorization;
+﻿using Inventart.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 

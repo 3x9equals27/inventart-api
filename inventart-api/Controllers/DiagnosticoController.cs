@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using Inventart.Services.Singleton;
-using inventart_api.Authorization;
+using Inventart.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

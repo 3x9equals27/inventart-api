@@ -1,6 +1,6 @@
 using Inventart.Config;
 using Inventart.Services.Singleton;
-using inventart_api.Authorization;
+using Inventart.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -118,10 +118,12 @@ namespace Inventart
             });
 
             //injectable configuration
-            services.Configure<PostgresConfig>(Configuration.GetSection("PostgreSQL"));
+            services.Configure<PostgresConfig>(Configuration.GetSection("PostgresConfig"));
+            services.Configure<JwtConfig>(Configuration.GetSection("JwtConfig"));
 
             //Singleton
             services.AddSingleton<ConnectionStringProvider>();
+            services.AddSingleton<JwtService>();
             services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
         }
 
