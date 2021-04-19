@@ -58,15 +58,14 @@ namespace Inventart.Repos
         }
         public async Task<string> RoleOfUserTenant(Guid userGuid, string tenantCode)
         {
+            string role = null;
             var fn_call = "select fn_user_tenant_role(@i_user_guid, @i_tenant_code);";
             DynamicParameters fn_params = new DynamicParameters(new { i_user_guid = userGuid, i_tenant_code = tenantCode });
             using (var connection = new NpgsqlConnection(_csp.ConnectionString))
             {
-                var results = (await connection.QueryAsync(fn_call, fn_params)).ToList(); //await Async
-                if (results.Count == 1)
-                    return results[0].fn_user_tenant_role;
+                role = (await connection.ExecuteScalarAsync<string>(fn_call, fn_params)); //await Async
             }
-            return null;
+            return role;
         }
     }
 }
