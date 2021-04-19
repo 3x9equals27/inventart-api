@@ -1,16 +1,16 @@
 ﻿using Inventart.Authorization;
+using Inventart.Repos;
+using Inventart.Services.Singleton;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System;
-using Microsoft.Extensions.DependencyInjection;
-using Inventart.Services.Singleton;
 using Microsoft.AspNetCore.Routing;
-using Inventart.Repos;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-public class RequiresAttribute : Attribute, IAuthorizationFilter 
+public class RequiresAttribute : Attribute, IAuthorizationFilter
 {
     //WIP: remove DEFAULT_TENANT_CODE after tenacy logic is added to the frontend
     private const string DEFAULT_TENANT_CODE = "FBAUL";
@@ -30,7 +30,7 @@ public class RequiresAttribute : Attribute, IAuthorizationFilter
         JwtService _jwt = context.HttpContext.RequestServices.GetService<JwtService>();
         AuthRepo _repo = context.HttpContext.RequestServices.GetService<AuthRepo>();
         //auth attribute Requires(Permission)
-        
+
         string[] authorizations = context.HttpContext.Request.Headers["Authorization"].ToArray();
         if (authorizations.Length != 1) //return 401 if more than 1 Auth Header is found
         {

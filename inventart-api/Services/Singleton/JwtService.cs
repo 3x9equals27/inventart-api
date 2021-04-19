@@ -1,5 +1,5 @@
-﻿using Inventart.Config;
-using Inventart.Authorization;
+﻿using Inventart.Authorization;
+using Inventart.Config;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;

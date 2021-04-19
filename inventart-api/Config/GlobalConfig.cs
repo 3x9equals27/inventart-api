@@ -7,6 +7,6 @@
         //read from settings
         public string BaseUrl { get; set; }
         public string VerificationPrefix { get; set; }
-        
+
     }
 }

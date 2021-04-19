@@ -1,24 +1,14 @@
-﻿using Dapper;
+﻿using Inventart.Authorization;
+using Inventart.Models.ControllerInputs;
+using Inventart.Repos;
 using Inventart.Services.Singleton;
-using Inventart.Authorization;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using bCrypt = BCrypt.Net.BCrypt;
-using Inventart.Repos;
-using System.ComponentModel;
-using Inventart.Models.ControllerInputs;
 
 
 namespace Inventart.Controllers
@@ -123,7 +113,7 @@ namespace Inventart.Controllers
                 return BadRequest("Wrong email or password.");
             //check if the passwords match
             bool verified = bCrypt.Verify(input.Password, user.password_hash);
-            if(!verified)
+            if (!verified)
                 return BadRequest("Wrong email or password.");
             //chec if the user has verified the email
             if (user.verified == false)

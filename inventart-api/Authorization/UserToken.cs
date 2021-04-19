@@ -9,7 +9,7 @@ namespace Inventart.Authorization
         public Guid guid { get; set; }
         //public string role { get; set; }
 
-        public UserToken(Guid guid/*,string role*/) 
+        public UserToken(Guid guid/*,string role*/)
         {
             this.guid = guid;
             //this.role = role;
@@ -22,7 +22,7 @@ namespace Inventart.Authorization
 
         public Claim[] GetClaims()
         {
-            return new[] { 
+            return new[] {
                 new Claim("guid", guid.ToString()), 
                 //new Claim("role", role) 
             };

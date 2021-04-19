@@ -1,7 +1,6 @@
 ﻿using Dapper;
-using Inventart.Services.Singleton;
 using Inventart.Authorization;
-using Microsoft.AspNetCore.Authorization;
+using Inventart.Services.Singleton;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +12,6 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using FileIO = System.IO.File;
 
 namespace Inventart.Controllers
 {
@@ -26,7 +24,7 @@ namespace Inventart.Controllers
         private readonly ConnectionStringProvider _csp;
 
         public DiagnosticoController(
-            ILogger<DiagnosticoController> logger, 
+            ILogger<DiagnosticoController> logger,
             IWebHostEnvironment webHostEnvironment,
             ConnectionStringProvider connectionStringProvider)
         {
@@ -53,7 +51,7 @@ namespace Inventart.Controllers
 
         [HttpPost("upload")]
         [Requires(Permission.UploadFile)]
-        public async Task<IActionResult> OnPostUploadAsync([FromQuery]Guid diagnostico, IFormFile file)
+        public async Task<IActionResult> OnPostUploadAsync([FromQuery] Guid diagnostico, IFormFile file)
         {
             Guid? file_guid = null;
             long size = file.Length;
@@ -79,7 +77,7 @@ namespace Inventart.Controllers
                     }
                 }
             }
-            
+
             // Process uploaded files
             // Don't rely on or trust the FileName property without validation.
 

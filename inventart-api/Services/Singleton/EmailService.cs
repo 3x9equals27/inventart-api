@@ -1,10 +1,8 @@
 ﻿using Inventart.Config;
-using Inventart.Authorization;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Net.Mail;
 using System.Net;
+using System.Net.Mail;
 
 namespace Inventart.Services.Singleton
 {

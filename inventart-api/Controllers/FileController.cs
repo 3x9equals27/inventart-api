@@ -2,15 +2,12 @@
 using Inventart.Authorization;
 using Inventart.Config;
 using Inventart.Services.Singleton;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,7 +24,7 @@ namespace Inventart.Controllers
         private readonly ConnectionStringProvider _csp;
 
         public FileController(
-            ILogger<FileController> logger, 
+            ILogger<FileController> logger,
             IWebHostEnvironment webHostEnvironment,
             ConnectionStringProvider connectionStringProvider)
         {
@@ -39,7 +36,7 @@ namespace Inventart.Controllers
         [HttpGet("link/{fileGuid}")]
         public async Task<IActionResult> GetLinkForFile(Guid fileGuid)
         {
-            if(Guid.Empty == fileGuid) return BadRequest();
+            if (Guid.Empty == fileGuid) return BadRequest();
 
             string folderPath = Path.Combine(_wenv.WebRootPath, GlobalConfig.WwwRootModelFolder, $"{fileGuid}");
 
@@ -55,7 +52,7 @@ namespace Inventart.Controllers
                     Directory.Delete(folderPath, true);
                 }
             }
-            
+
             //WIP: get this in its own service and use a stored proc
             List<dynamic> results = new List<dynamic>();
             var sql = "SELECT name, bytes FROM file WHERE guid = @guid";
@@ -76,7 +73,7 @@ namespace Inventart.Controllers
             string filePath = Path.Combine(folderPath, name);
             FileIO.WriteAllBytes(filePath, fileBytes);
 
-            return Ok(LinkToFile(fileGuid,name));
+            return Ok(LinkToFile(fileGuid, name));
         }
 
         private string LinkToFile(Guid fileGuid, string fileName)
