@@ -44,7 +44,6 @@ namespace Inventart.Repos
             }
             return success;
         }
-
         public async Task<dynamic> UserForLogin(string email)
         {
             var fn_call = "select * from fn_user_for_login(@i_email);";
@@ -54,6 +53,18 @@ namespace Inventart.Repos
                 var results = (await connection.QueryAsync(fn_call, fn_params)).ToList();
                 if (results.Count > 0)
                     return results.First();
+            }
+            return null;
+        }
+        public async Task<string> RoleOfUserTenant(Guid userGuid, string tenantCode)
+        {
+            var fn_call = "select fn_user_tenant_role(@i_user_guid, @i_tenant_code);";
+            DynamicParameters fn_params = new DynamicParameters(new { i_user_guid = userGuid, i_tenant_code = tenantCode });
+            using (var connection = new NpgsqlConnection(_csp.ConnectionString))
+            {
+                var results = (await connection.QueryAsync(fn_call, fn_params)).ToList(); //await Async
+                if (results.Count == 1)
+                    return results[0].fn_user_tenant_role;
             }
             return null;
         }

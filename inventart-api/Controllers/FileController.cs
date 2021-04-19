@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Inventart.Authorization;
 using Inventart.Config;
 using Inventart.Services.Singleton;
 using Microsoft.AspNetCore.Authorization;
@@ -17,7 +18,6 @@ using FileIO = System.IO.File;
 
 namespace Inventart.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class FileController : ControllerBase
@@ -35,7 +35,7 @@ namespace Inventart.Controllers
             _wenv = webHostEnvironment;
             _csp = connectionStringProvider;
         }
-
+        [Requires(Permission.ListDiagnostic)]
         [HttpGet("link/{fileGuid}")]
         public async Task<IActionResult> GetLinkForFile(Guid fileGuid)
         {

@@ -17,7 +17,6 @@ using FileIO = System.IO.File;
 
 namespace Inventart.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class DiagnosticoController : ControllerBase
@@ -37,13 +36,13 @@ namespace Inventart.Controllers
         }
 
         [HttpGet("list")]
-        [Authorize(Permission.ListDiagnostic)]
+        [Requires(Permission.ListDiagnostic)]
         public async Task<IActionResult> Get()
         {
             var x = Request.Headers["Authorization"];
 
             List<dynamic> results = new List<dynamic>();
-            var sql = "SELECT * FROM list_diagnostico()";
+            var sql = "SELECT * FROM fn_list_diagnostico()";
             //
             using (var connection = new NpgsqlConnection(_csp.ConnectionString))
             {
@@ -53,7 +52,7 @@ namespace Inventart.Controllers
         }
 
         [HttpPost("upload")]
-        [Authorize(Permission.UploadFile)]
+        [Requires(Permission.UploadFile)]
         public async Task<IActionResult> OnPostUploadAsync([FromQuery]Guid diagnostico, IFormFile file)
         {
             Guid? file_guid = null;

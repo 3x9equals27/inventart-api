@@ -5,7 +5,10 @@
     </assembly>
     <members>
         <member name="P:Inventart.Models.ControllerInputs.AuthLogin.Email">
-            <example>emailprefix@gmail.com</example>
+            <example>guest@inventart.com</example>
+        </member>
+        <member name="P:Inventart.Models.ControllerInputs.AuthLogin.Password">
+            <example>guest</example>
         </member>
         <member name="P:Inventart.Models.ControllerInputs.AuthRegister.Email">
             <example>emailprefix@gmail.com</example>

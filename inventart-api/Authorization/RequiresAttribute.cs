@@ -5,28 +5,32 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Inventart.Services.Singleton;
+using Microsoft.AspNetCore.Routing;
+using Inventart.Repos;
+using System.Threading.Tasks;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 public class RequiresAttribute : Attribute, IAuthorizationFilter 
 {
-    private readonly string requiredPermission; 
+    //WIP: remove DEFAULT_TENANT_CODE after tenacy logic is added to the frontend
+    private const string DEFAULT_TENANT_CODE = "FBAUL";
+    private readonly string requiredPermission;
     public RequiresAttribute(string permission)
     {
         requiredPermission = permission;
     }
 
+    // 1 - get token and tenant from headers
+    // 2 - validate token and get user guid
+    // 3 - use user guid and tenant to get user role on that tennats
+    // 4 - check if role has the permissions specified on [Authorize(permisson)]
 
     public void OnAuthorization(AuthorizationFilterContext context)
     {
         JwtService _jwt = context.HttpContext.RequestServices.GetService<JwtService>();
+        AuthRepo _repo = context.HttpContext.RequestServices.GetService<AuthRepo>();
         //auth attribute Requires(Permission)
-        // 1 - get token and tenant from headers
-        // 2 - validate token and get user guid
-        // 3 - use user guid and tenant to get user role on that tennats
-        // 4 - check if role has the permissions specified on [Authorize(permisson)]
-
-        string test = requiredPermission; //WIP remeber to use this permission later om
-
+        
         string[] authorizations = context.HttpContext.Request.Headers["Authorization"].ToArray();
         if (authorizations.Length != 1) //return 401 if more than 1 Auth Header is found
         {
@@ -53,19 +57,19 @@ public class RequiresAttribute : Attribute, IAuthorizationFilter
             return;
         }
 
-        string tenantId = context.HttpContext.Request.Headers["x-tenant-id"];
-        
+        Guid userGuid = userToken.guid;
+        string tenant = context.HttpContext.GetRouteData()?.Values["tenant"]?.ToString() ?? DEFAULT_TENANT_CODE;
+        string role = Task.Run(() => _repo.RoleOfUserTenant(userGuid, tenant)).Result; //can't do awaits here
 
-
-        /*
-        var account = (Account)context.HttpContext.Items["Account"];
-        if (account == null)
+        if (string.IsNullOrEmpty(role))
         {
-            // not logged in
-            context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+            context.Result = new JsonResult(new { message = "YOU SHALL NOT PASS" }) { StatusCode = StatusCodes.Status401Unauthorized };
+            return;
         }
-        */
-
-        context.Result = new JsonResult(new { message = "YOU SHALL NOT PASS" }) { StatusCode = StatusCodes.Status401Unauthorized };
+        if (false == PermissionManager.Check(this.requiredPermission, role))
+        {
+            context.Result = new JsonResult(new { message = "YOU SHALL NOT PASS" }) { StatusCode = StatusCodes.Status401Unauthorized };
+            return;
+        }
     }
 }
