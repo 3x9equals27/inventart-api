@@ -4,5 +4,11 @@
         <name>inventart-api</name>
     </assembly>
     <members>
+        <member name="P:Inventart.Models.ControllerInputs.AuthLogin.Email">
+            <example>emailprefix@gmail.com</example>
+        </member>
+        <member name="P:Inventart.Models.ControllerInputs.AuthRegister.Email">
+            <example>emailprefix@gmail.com</example>
+        </member>
     </members>
 </doc>

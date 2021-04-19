@@ -1,0 +1,61 @@
+﻿using Dapper;
+using Inventart.Services.Singleton;
+using Npgsql;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Inventart.Repos
+{
+    public class AuthRepo
+    {
+        private readonly ConnectionStringProvider _csp;
+
+        public AuthRepo(ConnectionStringProvider connectionStringProvider)
+        {
+            _csp = connectionStringProvider;
+        }
+
+        public Guid UserRegistration(string email, string passwordHash)
+        {
+            Guid? verification_guid = null;
+            var sp_call = "CALL sp_user_registration(@i_email, @i_password_hash, @o_verification_guid)";
+            DynamicParameters sp_params = new DynamicParameters(new { i_email = email, i_password_hash = passwordHash });
+            sp_params.Add("@o_verification_guid", value: null, DbType.Guid, direction: ParameterDirection.InputOutput);
+            using (var connection = new NpgsqlConnection(_csp.ConnectionString))
+            {
+                connection.Execute(sp_call, sp_params);
+                verification_guid = sp_params.Get<Guid>("o_verification_guid");
+            }
+            return verification_guid.Value;
+        }
+        public bool UserVerification(Guid verificationGuid)
+        {
+            bool success = false;
+            var sp_call = "CALL sp_user_verification(@i_verification_guid, @o_success)";
+            DynamicParameters sp_params = new DynamicParameters(new { i_verification_guid = verificationGuid });
+            sp_params.Add("@o_success", value: null, DbType.Boolean, direction: ParameterDirection.InputOutput);
+            using (var connection = new NpgsqlConnection(_csp.ConnectionString))
+            {
+                connection.Execute(sp_call, sp_params);
+                success = sp_params.Get<bool>("o_success");
+            }
+            return success;
+        }
+
+        public async Task<dynamic> UserForLogin(string email)
+        {
+            var fn_call = "select * from fn_user_for_login(@i_email);";
+            DynamicParameters fn_params = new DynamicParameters(new { i_email = email });
+            using (var connection = new NpgsqlConnection(_csp.ConnectionString))
+            {
+                var results = (await connection.QueryAsync(fn_call, fn_params)).ToList();
+                if (results.Count > 0)
+                    return results.First();
+            }
+            return null;
+        }
+    }
+}

@@ -6,5 +6,7 @@
         public const string WwwRootModelFolder = "models";
         //read from settings
         public string BaseUrl { get; set; }
+        public string VerificationPrefix { get; set; }
+        
     }
 }

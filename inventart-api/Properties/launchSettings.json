@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "inventart_api": {
+    "Inventart": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
       "launchBrowser": true,

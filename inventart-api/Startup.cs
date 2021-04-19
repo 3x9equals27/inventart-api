@@ -20,6 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Inventart.Repos;
 
 namespace Inventart
 {
@@ -79,6 +80,13 @@ namespace Inventart
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey
+                });
                 c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme()
                 {
                     Type = SecuritySchemeType.OAuth2,
@@ -90,6 +98,20 @@ namespace Inventart
                             AuthorizationUrl = new Uri($"{swag.ImplicitFlowAuthorizationUrl}?audience={swag.OAuthAudience}"),
                             Scopes = { }
                         }
+                    }
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
                     }
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement()
@@ -118,12 +140,16 @@ namespace Inventart
             });
 
             //injectable configuration
+            services.Configure<GlobalConfig>(Configuration.GetSection("GlobalConfig"));
             services.Configure<PostgresConfig>(Configuration.GetSection("PostgresConfig"));
             services.Configure<JwtConfig>(Configuration.GetSection("JwtConfig"));
-
+            services.Configure<SmtpConfig>(Configuration.GetSection("SmtpConfig"));
+            
             //Singleton
             services.AddSingleton<ConnectionStringProvider>();
-            services.AddSingleton<JwtService>();
+            services.AddSingleton<JwtService>(); 
+            services.AddSingleton<EmailService>();
+            services.AddSingleton<AuthRepo>();
             services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
         }
 

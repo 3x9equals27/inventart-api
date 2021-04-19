@@ -66,9 +66,9 @@ namespace Inventart.Controllers
                     await file.CopyToAsync(ms);
                     byte[] fileBytes = ms.ToArray();
                     // save to database
-                    DynamicParameters sp_params = new DynamicParameters(new { p_guid = diagnostico, p_name = file.FileName, p_bytes = fileBytes });
+                    DynamicParameters sp_params = new DynamicParameters(new { i_guid = diagnostico, i_name = file.FileName, i_bytes = fileBytes });
                     sp_params.Add("@o_file_guid", value: null, DbType.Guid, direction: ParameterDirection.InputOutput);
-                    var sql = "CALL sp_upload_file_diagnostico(@p_guid, @p_name, @p_bytes, @o_file_guid)";
+                    var sql = "CALL sp_upload_file_diagnostico(@i_guid, @i_name, @i_bytes, @o_file_guid)";
                     //
                     using (var connection = new NpgsqlConnection(_csp.ConnectionString))
                     {
