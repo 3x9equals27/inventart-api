@@ -30,6 +30,7 @@ namespace Inventart.Repos
             }
             return verification_guid.Value;
         }
+
         public bool UserVerification(Guid verificationGuid)
         {
             bool success = false;
@@ -43,6 +44,7 @@ namespace Inventart.Repos
             }
             return success;
         }
+
         public async Task<dynamic> UserForLogin(string email)
         {
             var fn_call = "select * from fn_user_for_login(@i_email);";
@@ -55,6 +57,7 @@ namespace Inventart.Repos
             }
             return null;
         }
+
         public async Task<string> RoleOfUserTenant(Guid userGuid, string tenantCode)
         {
             string role = null;

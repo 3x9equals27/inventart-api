@@ -32,6 +32,7 @@ namespace Inventart.Controllers
             _wenv = webHostEnvironment;
             _csp = connectionStringProvider;
         }
+
         [Requires(Permission.ListDiagnostic)]
         [HttpGet("link/{fileGuid}")]
         public async Task<IActionResult> GetLinkForFile(Guid fileGuid)
@@ -80,6 +81,5 @@ namespace Inventart.Controllers
         {
             return $"{Request.Scheme}://{Request.Host.Value}/{GlobalConfig.WwwRootModelFolder}/{fileGuid}/{fileName}";
         }
-
     }
 }

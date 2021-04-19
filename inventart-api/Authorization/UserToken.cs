@@ -14,6 +14,7 @@ namespace Inventart.Authorization
             this.guid = guid;
             //this.role = role;
         }
+
         public UserToken(Claim[] claims)
         {
             guid = Guid.Parse(claims.First(x => x.Type == "guid").Value);
@@ -23,8 +24,8 @@ namespace Inventart.Authorization
         public Claim[] GetClaims()
         {
             return new[] {
-                new Claim("guid", guid.ToString()), 
-                //new Claim("role", role) 
+                new Claim("guid", guid.ToString()),
+                //new Claim("role", role)
             };
         }
     }

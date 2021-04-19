@@ -14,7 +14,9 @@ public class RequiresAttribute : Attribute, IAuthorizationFilter
 {
     //WIP: remove DEFAULT_TENANT_CODE after tenacy logic is added to the frontend
     private const string DEFAULT_TENANT_CODE = "FBAUL";
+
     private readonly string requiredPermission;
+
     public RequiresAttribute(string permission)
     {
         requiredPermission = permission;

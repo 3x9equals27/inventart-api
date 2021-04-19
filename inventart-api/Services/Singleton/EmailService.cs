@@ -10,11 +10,13 @@ namespace Inventart.Services.Singleton
     {
         private readonly SmtpConfig smtpConfig;
         private readonly GlobalConfig globalConfig;
+
         public EmailService(IOptions<SmtpConfig> smtpConfig, IOptions<GlobalConfig> globalConfig)
         {
             this.smtpConfig = smtpConfig.Value;
             this.globalConfig = globalConfig.Value;
         }
+
         public void SendVerificationLink(string registrationEmail, Guid verificationGuid)
         {
             string fromAddress = smtpConfig.Address;

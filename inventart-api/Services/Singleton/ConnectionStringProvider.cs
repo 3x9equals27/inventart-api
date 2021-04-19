@@ -7,6 +7,7 @@ namespace Inventart.Services.Singleton
     {
         private readonly PostgresConfig _config;
         public string ConnectionString { get; }
+
         public ConnectionStringProvider(IOptions<PostgresConfig> postgresConfig)
         {
             _config = postgresConfig.Value;

@@ -11,8 +11,10 @@ namespace Inventart.Authorization
             {
                 case Permission.ListDiagnostic:
                     return role.EqualsAny(Role.Curator, Role.Contributor, Role.Visitor, Role.Guest);
+
                 case Permission.UploadFile:
                     return role.EqualsAny(Role.Curator);
+
                 default:
                     return false;
             }

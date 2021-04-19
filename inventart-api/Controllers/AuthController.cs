@@ -10,7 +10,6 @@ using System;
 using System.Threading.Tasks;
 using bCrypt = BCrypt.Net.BCrypt;
 
-
 namespace Inventart.Controllers
 {
     [ApiController]
@@ -104,6 +103,7 @@ namespace Inventart.Controllers
                 return BadRequest();
             return Ok();
         }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login(AuthLogin input)
         {
@@ -123,6 +123,5 @@ namespace Inventart.Controllers
             string token = _jwt.GenerateJwtToken(userToken);
             return Ok(token);
         }
-
     }
 }

@@ -139,6 +139,5 @@ namespace Inventart
                 obj.Context.Response.Headers["Access-Control-Allow-Origin"] = origin;
             }
         }
-
     }
 }

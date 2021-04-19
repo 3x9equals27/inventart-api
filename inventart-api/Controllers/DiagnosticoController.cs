@@ -83,6 +83,5 @@ namespace Inventart.Controllers
 
             return Ok(new { count = 1, size, file_guid });
         }
-
     }
 }

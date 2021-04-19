@@ -14,11 +14,13 @@ namespace Inventart.Services.Singleton
     {
         private readonly JwtConfig _config;
         private readonly SymmetricSecurityKey _key;
+
         public JwtService(IOptions<JwtConfig> jwtConfig)
         {
             _config = jwtConfig.Value;
             _key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_config.Secret));
         }
+
         public string GenerateJwtToken(UserToken userToken)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
