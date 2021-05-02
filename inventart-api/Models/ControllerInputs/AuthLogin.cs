@@ -2,7 +2,7 @@
 {
     public class AuthLogin
     {
-        ///<example>guest@inventart.com</example>
+        ///<example>guest@inventart</example>
         public string Email { get; set; }
 
         ///<example>guest</example>

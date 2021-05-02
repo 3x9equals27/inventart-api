@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\ControllerOutputs\" />
     <Folder Include="Models\RepoOutputs\" />
     <Folder Include="Services\Scoped\" />
     <Folder Include="Services\Transient\" />

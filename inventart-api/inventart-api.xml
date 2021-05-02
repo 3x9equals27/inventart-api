@@ -5,13 +5,25 @@
     </assembly>
     <members>
         <member name="P:Inventart.Models.ControllerInputs.AuthLogin.Email">
-            <example>guest@inventart.com</example>
+            <example>guest@inventart</example>
         </member>
         <member name="P:Inventart.Models.ControllerInputs.AuthLogin.Password">
             <example>guest</example>
         </member>
         <member name="P:Inventart.Models.ControllerInputs.AuthRegister.Email">
-            <example>emailprefix@gmail.com</example>
+            <example>something@gmail.com</example>
+        </member>
+        <member name="P:Inventart.Models.ControllerInputs.AuthRegister.Password">
+            <example>1234</example>
+        </member>
+        <member name="P:Inventart.Models.ControllerInputs.AuthRegister.PasswordRepeat">
+            <example>1234</example>
+        </member>
+        <member name="P:Inventart.Models.ControllerInputs.AuthRegister.FirstName">
+            <example>John</example>
+        </member>
+        <member name="P:Inventart.Models.ControllerInputs.AuthRegister.LastName">
+            <example>Doe</example>
         </member>
     </members>
 </doc>

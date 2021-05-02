@@ -1,19 +1,24 @@
 ﻿using Inventart.Authorization;
+using Inventart.Config;
 using Inventart.Models.ControllerInputs;
+using Inventart.Models.ControllerOutputs;
 using Inventart.Repos;
 using Inventart.Services.Singleton;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Npgsql;
 using System;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using bCrypt = BCrypt.Net.BCrypt;
 
 namespace Inventart.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("auth")]
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
@@ -22,6 +27,7 @@ namespace Inventart.Controllers
         private readonly JwtService _jwt;
         private readonly AuthRepo _repo;
         private readonly EmailService _email;
+        private readonly GlobalConfig _globalConfig;
 
         public AuthController(
             ILogger<AuthController> logger,
@@ -29,7 +35,8 @@ namespace Inventart.Controllers
             ConnectionStringProvider connectionStringProvider,
             JwtService jwtService,
             AuthRepo authRepo,
-            EmailService emailService)
+            EmailService emailService, 
+            IOptions<GlobalConfig> globalConfig)
         {
             _logger = logger;
             _wenv = webHostEnvironment;
@@ -37,6 +44,7 @@ namespace Inventart.Controllers
             _jwt = jwtService;
             _repo = authRepo;
             _email = emailService;
+            _globalConfig = globalConfig.Value;
         }
 
         [HttpPost("test")]
@@ -61,16 +69,36 @@ namespace Inventart.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(AuthRegister input)
         {
+            if (string.IsNullOrWhiteSpace(input.Email)) return BadRequest("Empty email");
+            if (string.IsNullOrWhiteSpace(input.Password)) return BadRequest("Empty password");
+            if (string.IsNullOrWhiteSpace(input.PasswordRepeat)) return BadRequest("Empty password");
+            if (string.IsNullOrWhiteSpace(input.FirstName)) return BadRequest("Empty first name");
+            if (string.IsNullOrWhiteSpace(input.LastName)) return BadRequest("Empty last name");
+
             // validate email and return BadRequest if it does not conform
+            try
+            {
+                MailAddress addr = new MailAddress(input.Email);
+            }
+            catch
+            {
+                return BadRequest("Invalid email");
+            }
 
             // validate password and return BadRequest if it does not conform
+            if (input.Password != input.PasswordRepeat)
+                return BadRequest("passwords don't match");
 
-            // has the password
+            if (input.Password.Length < 4)
+                return BadRequest("password too small");
+
+            // hash the password
             string passwordHash = bCrypt.HashPassword(input.Password);
+            string defaultTenant = this.getUserDefaultTenant(input.Email);
             Guid? verificationGuid = null;
             try
             {
-                verificationGuid = _repo.UserRegistration(input.Email, passwordHash);
+                verificationGuid = _repo.UserRegistration(input.Email, passwordHash, input.FirstName, input.LastName, defaultTenant);
             }
             catch (PostgresException px)
             {
@@ -122,6 +150,27 @@ namespace Inventart.Controllers
             var userToken = new UserToken(guid: user.guid);
             string token = _jwt.GenerateJwtToken(userToken);
             return Ok(token);
+        }
+
+        [HttpPost("userinfo")]
+        [Requires()]
+        public async Task<IActionResult> UserInfo()
+        {
+            Guid userGuid = (Guid)HttpContext.Items["UserGuid"];
+
+            UserInfo userInfo = await _repo.UserInfo(userGuid);
+            
+            return Ok(userInfo);
+        }
+
+        private string getUserDefaultTenant(string email)
+        {
+            string emailSuffix = $"@{email.Split('@')[1]}";
+            string defaultTenant = string.Empty;
+            if (_globalConfig.DefaultTenantsEmail.ContainsKey(emailSuffix))
+                return _globalConfig.DefaultTenantsEmail[emailSuffix];
+
+            return defaultTenant;
         }
     }
 }

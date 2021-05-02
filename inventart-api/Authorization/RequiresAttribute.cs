@@ -21,6 +21,10 @@ public class RequiresAttribute : Attribute, IAuthorizationFilter
     {
         requiredPermission = permission;
     }
+    public RequiresAttribute()
+    {
+        requiredPermission = string.Empty;
+    }
 
     // 1 - get token and tenant from headers
     // 2 - validate token and get user guid
@@ -58,6 +62,13 @@ public class RequiresAttribute : Attribute, IAuthorizationFilter
             context.Result = new JsonResult(new { message = "YOU SHALL NOT PASS" }) { StatusCode = StatusCodes.Status401Unauthorized };
             return;
         }
+
+        //set guid of user
+        context.HttpContext.Items["UserGuid"] = userToken.guid;
+
+        //If no permission is required the user only needs to be authenticated
+        if (this.requiredPermission == string.Empty)
+            return;
 
         Guid userGuid = userToken.guid;
         string tenant = context.HttpContext.GetRouteData()?.Values["tenant"]?.ToString() ?? DEFAULT_TENANT_CODE;

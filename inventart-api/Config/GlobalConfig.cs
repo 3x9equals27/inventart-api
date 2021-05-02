@@ -1,4 +1,6 @@
-﻿namespace Inventart.Config
+﻿using System.Collections.Generic;
+
+namespace Inventart.Config
 {
     public class GlobalConfig
     {
@@ -9,5 +11,6 @@
         public string BaseUrl { get; set; }
 
         public string VerificationPrefix { get; set; }
+        public Dictionary<string,string> DefaultTenantsEmail { get; set; }
     }
 }
