@@ -1,8 +1,8 @@
 ﻿using Dapper;
-using Inventart.Models.ControllerOutputs;
 using Inventart.Services.Singleton;
 using Npgsql;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -58,7 +58,7 @@ namespace Inventart.Repos
             }
             return null;
         }
-        public async Task<UserInfo> UserInfo(Guid guid)
+        public async Task<dynamic> UserInfo(Guid guid)
         {
             var fn_call = "select * from fn_user_info(@i_guid);";
             DynamicParameters fn_params = new DynamicParameters(new { i_guid = guid });
@@ -68,16 +68,20 @@ namespace Inventart.Repos
                 if (results.Count > 0)
                 {
                     dynamic userInfo = results.First();
-                    return new UserInfo()
-                    {
-                        DefaultTenant = userInfo.default_tenant,
-                        Email = userInfo.email,
-                        FirstName = userInfo.first_name,
-                        LastName = userInfo.last_name
-                    };
+                    return userInfo;
                 }
             }
             return null;
+        }
+        public async Task<List<dynamic>> UserTenants(Guid guid)
+        {
+            var fn_call = "select * from fn_user_tenants(@i_guid);";
+            DynamicParameters fn_params = new DynamicParameters(new { i_guid = guid });
+            using (var connection = new NpgsqlConnection(_csp.ConnectionString))
+            {
+                var results = (await connection.QueryAsync(fn_call, fn_params)).ToList();
+                return results;
+            }
         }
 
         public async Task<string> RoleOfUserTenant(Guid userGuid, string tenantCode)

@@ -1,7 +1,6 @@
 ﻿using Inventart.Authorization;
 using Inventart.Config;
 using Inventart.Models.ControllerInputs;
-using Inventart.Models.ControllerOutputs;
 using Inventart.Repos;
 using Inventart.Services.Singleton;
 using Microsoft.AspNetCore.Hosting;
@@ -158,9 +157,20 @@ namespace Inventart.Controllers
         {
             Guid userGuid = (Guid)HttpContext.Items["UserGuid"];
 
-            UserInfo userInfo = await _repo.UserInfo(userGuid);
+            dynamic userInfo = await _repo.UserInfo(userGuid);
             
             return Ok(userInfo);
+        }
+
+        [HttpPost("usertenants")]
+        [Requires()]
+        public async Task<IActionResult> UserTenants()
+        {
+            Guid userGuid = (Guid)HttpContext.Items["UserGuid"];
+
+            var userTenants = await _repo.UserTenants(userGuid);
+
+            return Ok(userTenants);
         }
 
         private string getUserDefaultTenant(string email)
