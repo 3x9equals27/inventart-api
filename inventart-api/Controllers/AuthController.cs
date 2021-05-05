@@ -173,6 +173,17 @@ namespace Inventart.Controllers
             return Ok(userTenants);
         }
 
+        [HttpPost("usertenant")]
+        [Requires()]
+        public async Task<IActionResult> UserTenant(string tenant)
+        {
+            Guid userGuid = (Guid)HttpContext.Items["UserGuid"];
+
+            var userTenant = await _repo.UserTenant(userGuid, tenant);
+
+            return Ok(userTenant);
+        }
+
         private string getUserDefaultTenant(string email)
         {
             string emailSuffix = $"@{email.Split('@')[1]}";

@@ -45,6 +45,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="inventart-api.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
