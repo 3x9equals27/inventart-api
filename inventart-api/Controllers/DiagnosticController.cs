@@ -17,14 +17,14 @@ namespace Inventart.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class DiagnosticoController : ControllerBase
+    public class DiagnosticController : ControllerBase
     {
-        private readonly ILogger<DiagnosticoController> _logger;
+        private readonly ILogger<DiagnosticController> _logger;
         private readonly IWebHostEnvironment _wenv;
         private readonly ConnectionStringProvider _csp;
 
-        public DiagnosticoController(
-            ILogger<DiagnosticoController> logger,
+        public DiagnosticController(
+            ILogger<DiagnosticController> logger,
             IWebHostEnvironment webHostEnvironment,
             ConnectionStringProvider connectionStringProvider)
         {
@@ -33,18 +33,19 @@ namespace Inventart.Controllers
             _csp = connectionStringProvider;
         }
 
-        [HttpGet("list")]
+        [HttpGet("{tenant}/list-all")]
         [Requires(Permission.ListDiagnostic)]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromRoute] string tenant)
         {
             var x = Request.Headers["Authorization"];
 
             List<dynamic> results = new List<dynamic>();
-            var sql = "SELECT * FROM fn_list_diagnostico()";
+            var sql = "SELECT * FROM fn_diagnostico_list_all(@i_tenant)";
+            DynamicParameters sql_params = new DynamicParameters(new { i_tenant = tenant });
             //
             using (var connection = new NpgsqlConnection(_csp.ConnectionString))
             {
-                results = (await connection.QueryAsync(sql)).ToList();
+                results = (await connection.QueryAsync(sql, sql_params)).ToList();
             }
             return Ok(results);
         }

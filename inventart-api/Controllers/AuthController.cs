@@ -151,7 +151,7 @@ namespace Inventart.Controllers
             return Ok(token);
         }
 
-        [HttpPost("userinfo")]
+        [HttpPost("user-info")]
         [Requires()]
         public async Task<IActionResult> UserInfo()
         {
@@ -162,7 +162,7 @@ namespace Inventart.Controllers
             return Ok(userInfo);
         }
 
-        [HttpPost("usertenants")]
+        [HttpPost("user-tenants")]
         [Requires()]
         public async Task<IActionResult> UserTenants()
         {
@@ -173,7 +173,7 @@ namespace Inventart.Controllers
             return Ok(userTenants);
         }
 
-        [HttpPost("usertenant")]
+        [HttpPost("user-tenant")]
         [Requires()]
         public async Task<IActionResult> UserTenant(string tenant)
         {
