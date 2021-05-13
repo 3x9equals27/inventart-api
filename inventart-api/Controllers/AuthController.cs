@@ -137,14 +137,14 @@ namespace Inventart.Controllers
             var user = await _repo.UserForLogin(input.Email);
             //check if a user with that email exists
             if (user == null)
-                return BadRequest("Wrong email or password.");
+                return BadRequest("email.not.found");
             //check if the passwords match
             bool verified = bCrypt.Verify(input.Password, user.password_hash);
             if (!verified)
-                return BadRequest("Wrong email or password.");
-            //chec if the user has verified the email
+                return BadRequest("wrong.password");
+            //check if the user has verified the email
             if (user.verified == false)
-                return BadRequest("Email not verified.");
+                return BadRequest("email.unverified");
             //create and return the jwt token
             var userToken = new UserToken(guid: user.guid);
             string token = _jwt.GenerateJwtToken(userToken);
