@@ -139,7 +139,14 @@ namespace Inventart.Controllers
             if (user == null)
                 return BadRequest("email.not.found");
             //check if the passwords match
-            bool verified = bCrypt.Verify(input.Password, user.password_hash);
+            bool verified = false;
+            try
+            {
+                verified = bCrypt.Verify(input.Password, user.password_hash);
+            } catch
+            {
+                verified = false;
+            }
             if (!verified)
                 return BadRequest("wrong.password");
             //check if the user has verified the email
@@ -182,6 +189,47 @@ namespace Inventart.Controllers
             var userTenant = await _repo.UserTenant(userGuid, tenant);
 
             return Ok(userTenant);
+        }
+
+        [HttpPost("password-reset-step1")]
+        public async Task<IActionResult> PasswordResetStep1(string email)
+        {
+            Guid? resetGuid = null;
+            try
+            {
+                resetGuid = _repo.PasswordResetStep1(email);
+            }
+            catch (PostgresException px)
+            {
+                throw;
+            }
+
+            if (!resetGuid.HasValue)
+                return BadRequest();
+
+            //send mail
+            _email.SendPasswordResetLink(email, resetGuid.Value);
+
+            return Ok();
+        }
+
+        [HttpPost("password-reset-step2")]
+        public async Task<IActionResult> PasswordResetStep2(Guid password_reset_guid, string password_hash)
+        {
+            bool success = false;
+            try
+            {
+                success = _repo.PasswordResetStep2(password_reset_guid, password_hash);
+            }
+            catch (PostgresException px)
+            {
+                throw;
+            }
+
+            if (!success)
+                return BadRequest();
+
+            return Ok();
         }
 
         private string getUserDefaultTenant(string email)

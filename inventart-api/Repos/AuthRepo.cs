@@ -105,5 +105,32 @@ namespace Inventart.Repos
             }
             return role;
         }
+
+        public Guid? PasswordResetStep1(string email)
+        {
+            Guid? password_reset_guid = null;
+            var sp_call = "CALL sp_auth_password_reset_step1(@i_email, @o_guid)";
+            DynamicParameters sp_params = new DynamicParameters(new { i_email = email });
+            sp_params.Add("@o_guid", value: null, DbType.Guid, direction: ParameterDirection.InputOutput);
+            using (var connection = new NpgsqlConnection(_csp.ConnectionString))
+            {
+                connection.Execute(sp_call, sp_params);
+                password_reset_guid = sp_params.Get<Guid?>("o_guid");
+            }
+            return password_reset_guid;
+        }
+        public bool PasswordResetStep2(Guid password_reset_guid, string password_hash)
+        {
+            bool success = false;
+            var sp_call = "CALL sp_auth_password_reset_step2(@i_password_reset_guid, @i_password_hash, @o_success)";
+            DynamicParameters sp_params = new DynamicParameters(new { i_password_reset_guid = password_reset_guid, i_password_hash = password_hash });
+            sp_params.Add("@o_success", value: null, DbType.Boolean, direction: ParameterDirection.InputOutput);
+            using (var connection = new NpgsqlConnection(_csp.ConnectionString))
+            {
+                connection.Execute(sp_call, sp_params);
+                success = sp_params.Get<bool>("o_success");
+            }
+            return success;
+        }
     }
 }

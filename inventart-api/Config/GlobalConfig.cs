@@ -11,6 +11,7 @@ namespace Inventart.Config
         public string BaseUrl { get; set; }
 
         public string VerificationPrefix { get; set; }
+        public string ResetPasswordStep2 { get; set; }
         public Dictionary<string,string> DefaultTenantsEmail { get; set; }
     }
 }

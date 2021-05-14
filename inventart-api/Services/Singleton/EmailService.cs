@@ -19,12 +19,24 @@ namespace Inventart.Services.Singleton
 
         public void SendVerificationLink(string registrationEmail, Guid verificationGuid)
         {
-            string fromAddress = smtpConfig.Address;
-            var toAddress = new MailAddress(registrationEmail);
-            string fromPassword = smtpConfig.Password;
             const string subject = "Inventart verification link";
             string body = $"Please verify your email using the link bellow:<BR/> {globalConfig.VerificationPrefix}{verificationGuid}";
 
+            this.SendMail(registrationEmail, subject, body);
+        }
+        public void SendPasswordResetLink(string email, Guid guid)
+        {
+            const string subject = "Inventart password reset";
+            string body = $"Password reset link:<BR/> {globalConfig.ResetPasswordStep2}{guid}";
+
+            this.SendMail(email, subject, body);
+        }
+
+        private void SendMail(string email, string subject, string body)
+        {
+            var toAddress = new MailAddress(email);
+            string fromAddress = smtpConfig.Address;
+            string fromPassword = smtpConfig.Password;
             using (MailMessage mail = new MailMessage())
             {
                 mail.From = new MailAddress(fromAddress, "Inventart");
