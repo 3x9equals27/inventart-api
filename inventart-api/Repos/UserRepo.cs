@@ -18,22 +18,6 @@ namespace Inventart.Repos
             _csp = connectionStringProvider;
         }
 
-        public async Task<dynamic> GetUserInfo(Guid guid)
-        {
-            var fn_call = "select * from fn_user_info(@i_guid);";
-            DynamicParameters fn_params = new DynamicParameters(new { i_guid = guid });
-            using (var connection = new NpgsqlConnection(_csp.ConnectionString))
-            {
-                var results = (await connection.QueryAsync(fn_call, fn_params)).ToList();
-                if (results.Count > 0)
-                {
-                    dynamic userInfo = results.First();
-                    return userInfo;
-                }
-            }
-            return null;
-        }
-
         public bool SetUserInfo(Guid user_guid, string firstName, string lastName, string defaultTenant, string defaultLanguage)
         {
             bool success = true;

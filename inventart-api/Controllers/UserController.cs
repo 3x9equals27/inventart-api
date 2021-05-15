@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Inventart.Controllers
 {
     [ApiController]
-    [Route("auth")]
+    [Route("user")]
     public class UserController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
@@ -20,17 +20,6 @@ namespace Inventart.Controllers
             UserRepo userRepo)
         {
             _repo = userRepo;
-        }
-
-        [HttpGet("view-self")]
-        [Requires(Permission.EditSelf)]
-        public async Task<IActionResult> ViewSelf()
-        {
-            Guid userGuid = (Guid)HttpContext.Items["UserGuid"];
-
-            dynamic userInfo = await _repo.GetUserInfo(userGuid);
-
-            return Ok(userInfo);
         }
 
         [HttpPost("edit-self")]
