@@ -6,10 +6,12 @@ namespace Inventart.Authorization
     {
         public const string ListDiagnostic = "list:diagnostic";
         public const string UploadFile = "upload:file";
+        public const string EditSelf = "edit:self";
 
         public static readonly List<string> PermissionList = new List<string>(){
             ListDiagnostic,
-            UploadFile
+            UploadFile,
+            EditSelf
         };
     }
 }

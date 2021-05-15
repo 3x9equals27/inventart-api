@@ -93,6 +93,7 @@ namespace Inventart
             services.AddSingleton<JwtService>();
             services.AddSingleton<EmailService>();
             services.AddSingleton<AuthRepo>();
+            services.AddSingleton<UserRepo>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
