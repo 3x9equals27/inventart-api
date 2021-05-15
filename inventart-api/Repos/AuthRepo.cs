@@ -119,10 +119,23 @@ namespace Inventart.Repos
             }
             return password_reset_guid;
         }
-        public bool PasswordResetStep2(Guid password_reset_guid, string password_hash)
+        public bool PasswordResetStep2a(Guid password_reset_guid)
+        {
+            bool exists = false;
+            var sp_call = "CALL sp_auth_password_reset_step2a(@i_password_reset_guid, @o_exists)";
+            DynamicParameters sp_params = new DynamicParameters(new { i_password_reset_guid = password_reset_guid });
+            sp_params.Add("@o_exists", value: null, DbType.Boolean, direction: ParameterDirection.InputOutput);
+            using (var connection = new NpgsqlConnection(_csp.ConnectionString))
+            {
+                connection.Execute(sp_call, sp_params);
+                exists = sp_params.Get<bool>("o_exists");
+            }
+            return exists;
+        }
+        public bool PasswordResetStep2b(Guid password_reset_guid, string password_hash)
         {
             bool success = false;
-            var sp_call = "CALL sp_auth_password_reset_step2(@i_password_reset_guid, @i_password_hash, @o_success)";
+            var sp_call = "CALL sp_auth_password_reset_step2b(@i_password_reset_guid, @i_password_hash, @o_success)";
             DynamicParameters sp_params = new DynamicParameters(new { i_password_reset_guid = password_reset_guid, i_password_hash = password_hash });
             sp_params.Add("@o_success", value: null, DbType.Boolean, direction: ParameterDirection.InputOutput);
             using (var connection = new NpgsqlConnection(_csp.ConnectionString))

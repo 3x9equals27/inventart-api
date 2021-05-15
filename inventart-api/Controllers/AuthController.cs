@@ -213,13 +213,45 @@ namespace Inventart.Controllers
             return Ok();
         }
 
-        [HttpPost("password-reset-step2")]
-        public async Task<IActionResult> PasswordResetStep2(Guid password_reset_guid, string password_hash)
+        [HttpPost("password-reset-step2a")]
+        public async Task<IActionResult> PasswordResetStep2a(Guid password_reset_guid)
         {
+            bool exists = false;
+            try
+            {
+                exists = _repo.PasswordResetStep2a(password_reset_guid);
+            }
+            catch (PostgresException px)
+            {
+                throw;
+            }
+
+            if (exists)
+                return Ok();
+
+            return BadRequest();
+        }
+
+        [HttpPost("password-reset-step2b")]
+        public async Task<IActionResult> PasswordResetStep2b(AuthPasswordReset input)
+        {
+            if (string.IsNullOrWhiteSpace(input.Password)) return BadRequest("Empty password");
+            if (string.IsNullOrWhiteSpace(input.PasswordRepeat)) return BadRequest("Empty password");
+
+            // validate password and return BadRequest if it does not conform
+            if (input.Password != input.PasswordRepeat)
+                return BadRequest("passwords don't match");
+
+            if (input.Password.Length < 4)
+                return BadRequest("password too small");
+
+            // hash the password
+            string passwordHash = bCrypt.HashPassword(input.Password);
+
             bool success = false;
             try
             {
-                success = _repo.PasswordResetStep2(password_reset_guid, password_hash);
+                success = _repo.PasswordResetStep2b(input.PasswordResetGuid, passwordHash);
             }
             catch (PostgresException px)
             {
