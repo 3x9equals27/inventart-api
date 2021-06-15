@@ -29,5 +29,15 @@ namespace Inventart.Repos
             }
             return success;
         }
+        public async Task<List<dynamic>> ListAllUsersRole(string tenantCode)
+        {
+            var fn_call = "select * from fn_user_list_role_all(@i_tenant_code);";
+            DynamicParameters fn_params = new DynamicParameters(new { i_tenant_code = tenantCode });
+            using (var connection = new NpgsqlConnection(_csp.ConnectionString))
+            {
+                var results = (await connection.QueryAsync(fn_call, fn_params)).ToList();
+                return results;
+            }
+        }
     }
 }

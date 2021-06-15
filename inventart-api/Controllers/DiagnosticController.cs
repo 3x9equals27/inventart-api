@@ -37,7 +37,7 @@ namespace Inventart.Controllers
         [Requires(Permission.ListDiagnostic)]
         public async Task<IActionResult> Get([FromRoute] string tenant)
         {
-            var x = Request.Headers["Authorization"];
+            //var x = Request.Headers["Authorization"];
 
             List<dynamic> results = new List<dynamic>();
             var sql = "SELECT * FROM fn_diagnostico_list_all(@i_tenant)";

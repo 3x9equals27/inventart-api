@@ -4,6 +4,7 @@ using Inventart.Repos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Inventart.Controllers
@@ -32,6 +33,14 @@ namespace Inventart.Controllers
             _repo.SetUserInfo(userGuid, input.FirstName, input.LastName, input.DefaultTenant, input.DefaultLanguage);
 
             return Ok();
+        }
+
+        [HttpGet("{tenant}/roles")]
+        [Requires(Permission.ListUserRole)]
+        public async Task<IActionResult> ListAllUsersRole([FromRoute] string tenant)
+        {
+            List<dynamic> results = await _repo.ListAllUsersRole(tenant);
+            return Ok(results);
         }
 
     }
