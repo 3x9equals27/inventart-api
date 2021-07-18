@@ -18,14 +18,14 @@ namespace Inventart.Repos
             _csp = connectionStringProvider;
         }
 
-        public bool SetUserInfo(Guid user_guid, string firstName, string lastName, string defaultTenant, string defaultLanguage)
+        public async Task<bool> SetUserInfo(Guid user_guid, string firstName, string lastName, string defaultTenant, string defaultLanguage)
         {
             bool success = true;
             var sp_call = "CALL sp_user_settings_edit(@i_user_guid, @i_first_name, @i_last_name, @i_default_tenant, @i_default_language)";
             DynamicParameters sp_params = new DynamicParameters(new { i_user_guid = user_guid, i_first_name = firstName, i_last_name = lastName, i_default_tenant = defaultTenant, i_default_language = defaultLanguage });
             using (var connection = new NpgsqlConnection(_csp.ConnectionString))
             {
-                connection.Execute(sp_call, sp_params);
+                await connection.ExecuteAsync(sp_call, sp_params);
             }
             return success;
         }
@@ -38,6 +38,17 @@ namespace Inventart.Repos
                 var results = (await connection.QueryAsync(fn_call, fn_params)).ToList();
                 return results;
             }
+        }
+        public async Task<bool> EditUserRole(Guid guid, string tenant, string role)
+        {
+            bool success = true;
+            var sp_call = "CALL sp_user_role_change(@i_user_guid, @i_tenant, @i_role)";
+            DynamicParameters sp_params = new DynamicParameters(new { i_user_guid = guid, i_tenant = tenant, i_role = role });
+            using (var connection = new NpgsqlConnection(_csp.ConnectionString))
+            {
+                await connection.ExecuteAsync(sp_call, sp_params);
+            }
+            return success;
         }
     }
 }

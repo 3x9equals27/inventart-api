@@ -21,6 +21,9 @@ namespace Inventart.Authorization
                 case Permission.UploadFile:
                     return role.EqualsAny(Role.Curator);
 
+                case Permission.EditRoles:
+                    return role.EqualsAny(Role.Curator);
+
                 default:
                     return false;
             }

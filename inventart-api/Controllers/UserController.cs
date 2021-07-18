@@ -30,7 +30,7 @@ namespace Inventart.Controllers
             //WIP validate user input
             Guid userGuid = (Guid)HttpContext.Items["UserGuid"];
 
-            _repo.SetUserInfo(userGuid, input.FirstName, input.LastName, input.DefaultTenant, input.DefaultLanguage);
+            await _repo.SetUserInfo(userGuid, input.FirstName, input.LastName, input.DefaultTenant, input.DefaultLanguage);
 
             return Ok();
         }
@@ -43,5 +43,12 @@ namespace Inventart.Controllers
             return Ok(results);
         }
 
+        [HttpPost("{tenant}/roleChange/{guid}/{role}")]
+        [Requires(Permission.EditRoles)]
+        public async Task<IActionResult> RoleChange([FromRoute] string tenant, [FromRoute] Guid guid, [FromRoute] string role)
+        {
+            await _repo.EditUserRole(guid, tenant, role);
+            return Ok();
+        }
     }
 }
