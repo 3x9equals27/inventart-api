@@ -21,7 +21,7 @@ namespace Inventart.Repos
         public Guid UserRegistration(string email, string passwordHash, string firstName, string lastName, string defaultTenant)
         {
             Guid? verification_guid = null;
-            var sp_call = "sp_user_registration";
+            var sp_name = "sp_user_registration";
             DynamicParameters sp_params = new DynamicParameters(new { i_email = email, i_password_hash = passwordHash, i_first_name = firstName, i_last_name = lastName, i_default_tenant = defaultTenant });
             sp_params.Add("o_verification_guid", value: null, DbType.Guid, direction: ParameterDirection.Output);
             using (var connection = new SqlConnection(_csp.ConnectionString))
