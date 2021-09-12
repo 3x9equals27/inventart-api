@@ -1,17 +1,24 @@
 ﻿using Inventart.Config;
 using Microsoft.Extensions.Options;
+using System.Data.SqlClient;
 
 namespace Inventart.Services.Singleton
 {
     public class ConnectionStringProvider
     {
-        private readonly PostgresConfig _config;
+        private readonly SqlServerConfig _config;
         public string ConnectionString { get; }
 
-        public ConnectionStringProvider(IOptions<PostgresConfig> postgresConfig)
+        public ConnectionStringProvider(IOptions<SqlServerConfig> config)
         {
-            _config = postgresConfig.Value;
-            ConnectionString = $"User ID={_config.User};Password={_config.Password};Host={_config.Hostname};Port={_config.Port};Database={_config.Database};SSL Mode=Require;Trust Server Certificate=true;";
+            _config = config.Value;
+            ConnectionString = new SqlConnectionStringBuilder()
+            {
+                DataSource = _config.DataSource,
+                InitialCatalog = _config.InitialCatalog,
+                UserID = _config.UserID,
+                Password = _config.Password
+            }.ConnectionString;
         }
     }
 }

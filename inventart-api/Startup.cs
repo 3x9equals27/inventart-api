@@ -84,7 +84,7 @@ namespace Inventart
 
             //injectable configuration
             services.Configure<GlobalConfig>(Configuration.GetSection("GlobalConfig"));
-            services.Configure<PostgresConfig>(Configuration.GetSection("PostgresConfig"));
+            services.Configure<SqlServerConfig>(Configuration.GetSection("SqlServerConfig"));
             services.Configure<JwtConfig>(Configuration.GetSection("JwtConfig"));
             services.Configure<SmtpConfig>(Configuration.GetSection("SmtpConfig"));
 

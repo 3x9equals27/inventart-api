@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -43,7 +43,7 @@ namespace Inventart.Controllers
             var sql = "SELECT * FROM fn_diagnostico_list_all(@i_tenant)";
             DynamicParameters sql_params = new DynamicParameters(new { i_tenant = tenant });
             //
-            using (var connection = new NpgsqlConnection(_csp.ConnectionString))
+            using (var connection = new SqlConnection(_csp.ConnectionString))
             {
                 results = (await connection.QueryAsync(sql, sql_params)).ToList();
             }
@@ -65,10 +65,10 @@ namespace Inventart.Controllers
                     byte[] fileBytes = ms.ToArray();
                     // save to database
                     DynamicParameters sp_params = new DynamicParameters(new { i_guid = diagnostico, i_name = file.FileName, i_bytes = fileBytes });
-                    sp_params.Add("@o_file_guid", value: null, DbType.Guid, direction: ParameterDirection.InputOutput);
-                    var sql = "CALL sp_upload_file_diagnostico(@i_guid, @i_name, @i_bytes, @o_file_guid)";
+                    sp_params.Add("@o_file_guid", value: null, DbType.Guid, direction: ParameterDirection.Output);
+                    var sql = "EXEC sp_upload_file_diagnostico(@i_guid, @i_name, @i_bytes, @o_file_guid)";
                     //
-                    using (var connection = new NpgsqlConnection(_csp.ConnectionString))
+                    using (var connection = new SqlConnection(_csp.ConnectionString))
                     {
                         connection.Execute(sql, sp_params);
                         file_guid = sp_params.Get<Guid>("o_file_guid");

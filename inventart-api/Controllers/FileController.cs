@@ -5,9 +5,9 @@ using Inventart.Services.Singleton;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -58,7 +58,7 @@ namespace Inventart.Controllers
             List<dynamic> results = new List<dynamic>();
             var sql = "SELECT name, bytes FROM file WHERE guid = @guid";
 
-            using (var connection = new NpgsqlConnection(_csp.ConnectionString))
+            using (var connection = new SqlConnection(_csp.ConnectionString))
             {
                 results = (await connection.QueryAsync(sql, new { guid = fileGuid })).ToList();
             }

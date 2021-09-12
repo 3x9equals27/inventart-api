@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Npgsql;
 using System;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -99,12 +98,12 @@ namespace Inventart.Controllers
             {
                 verificationGuid = _repo.UserRegistration(input.Email, passwordHash, input.FirstName, input.LastName, defaultTenant);
             }
-            catch (PostgresException px)
+            catch (Exception x) //WIP: check sql exception for duplicate key 
             {
-                if (px.SqlState == "23505")
-                {
-                    return BadRequest("that email already exists");
-                }
+                //if (px.SqlState == "23505")
+                //{
+                //    return BadRequest("that email already exists");
+                //}
                 throw;
             }
             _email.SendVerificationLink(input.Email, verificationGuid.Value);
@@ -121,7 +120,7 @@ namespace Inventart.Controllers
             {
                 success = _repo.UserVerification(verificationGuid);
             }
-            catch (PostgresException px)
+            catch (Exception x)
             {
                 throw;
             }
@@ -199,7 +198,7 @@ namespace Inventart.Controllers
             {
                 resetGuid = _repo.PasswordResetStep1(email);
             }
-            catch (PostgresException px)
+            catch (Exception x)
             {
                 throw;
             }
@@ -221,7 +220,7 @@ namespace Inventart.Controllers
             {
                 exists = _repo.PasswordResetStep2a(password_reset_guid);
             }
-            catch (PostgresException px)
+            catch (Exception x)
             {
                 throw;
             }
@@ -253,7 +252,7 @@ namespace Inventart.Controllers
             {
                 success = _repo.PasswordResetStep2b(input.PasswordResetGuid, passwordHash);
             }
-            catch (PostgresException px)
+            catch (Exception x)
             {
                 throw;
             }
