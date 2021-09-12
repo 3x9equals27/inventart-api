@@ -26,7 +26,7 @@ namespace Inventart.Repos
             sp_params.Add("o_verification_guid", value: null, DbType.Guid, direction: ParameterDirection.Output);
             using (var connection = new SqlConnection(_csp.ConnectionString))
             {
-                connection.Execute(sp_call, sp_params, commandType: CommandType.StoredProcedure);
+                connection.Execute(sp_name, sp_params, commandType: CommandType.StoredProcedure);
                 verification_guid = sp_params.Get<Guid>("o_verification_guid");
             }
             return verification_guid.Value;
@@ -35,12 +35,12 @@ namespace Inventart.Repos
         public bool UserVerification(Guid verificationGuid)
         {
             bool success = false;
-            var sp_call = "EXEC sp_user_verification @i_verification_guid, @o_success";
+            var sp_name = "sp_user_verification";
             DynamicParameters sp_params = new DynamicParameters(new { i_verification_guid = verificationGuid });
-            sp_params.Add("@o_success", value: null, DbType.Boolean, direction: ParameterDirection.Output);
+            sp_params.Add("o_success", value: null, DbType.Boolean, direction: ParameterDirection.Output);
             using (var connection = new SqlConnection(_csp.ConnectionString))
             {
-                connection.Execute(sp_call, sp_params);
+                connection.Execute(sp_name, sp_params, commandType: CommandType.StoredProcedure);
                 success = sp_params.Get<bool>("o_success");
             }
             return success;
@@ -109,12 +109,12 @@ namespace Inventart.Repos
         public Guid? PasswordResetStep1(string email)
         {
             Guid? password_reset_guid = null;
-            var sp_call = "EXEC sp_auth_password_reset_step1 @i_email, @o_guid";
+            var sp_name = "sp_auth_password_reset_step1";
             DynamicParameters sp_params = new DynamicParameters(new { i_email = email });
-            sp_params.Add("@o_guid", value: null, DbType.Guid, direction: ParameterDirection.Output);
+            sp_params.Add("o_guid", value: null, DbType.Guid, direction: ParameterDirection.Output);
             using (var connection = new SqlConnection(_csp.ConnectionString))
             {
-                connection.Execute(sp_call, sp_params);
+                connection.Execute(sp_name, sp_params, commandType: CommandType.StoredProcedure);
                 password_reset_guid = sp_params.Get<Guid?>("o_guid");
             }
             return password_reset_guid;
@@ -122,12 +122,12 @@ namespace Inventart.Repos
         public bool PasswordResetStep2a(Guid password_reset_guid)
         {
             bool exists = false;
-            var sp_call = "EXEC sp_auth_password_reset_step2a @i_password_reset_guid, @o_exists";
+            var sp_name = "sp_auth_password_reset_step2a";
             DynamicParameters sp_params = new DynamicParameters(new { i_password_reset_guid = password_reset_guid });
-            sp_params.Add("@o_exists", value: null, DbType.Boolean, direction: ParameterDirection.Output);
+            sp_params.Add("o_exists", value: null, DbType.Boolean, direction: ParameterDirection.Output);
             using (var connection = new SqlConnection(_csp.ConnectionString))
             {
-                connection.Execute(sp_call, sp_params);
+                connection.Execute(sp_name, sp_params, commandType: CommandType.StoredProcedure);
                 exists = sp_params.Get<bool>("o_exists");
             }
             return exists;
@@ -135,12 +135,12 @@ namespace Inventart.Repos
         public bool PasswordResetStep2b(Guid password_reset_guid, string password_hash)
         {
             bool success = false;
-            var sp_call = "EXEC sp_auth_password_reset_step2b @i_password_reset_guid, @i_password_hash, @o_success";
+            var sp_name = "sp_auth_password_reset_step2b";
             DynamicParameters sp_params = new DynamicParameters(new { i_password_reset_guid = password_reset_guid, i_password_hash = password_hash });
-            sp_params.Add("@o_success", value: null, DbType.Boolean, direction: ParameterDirection.Output);
+            sp_params.Add("o_success", value: null, DbType.Boolean, direction: ParameterDirection.Output);
             using (var connection = new SqlConnection(_csp.ConnectionString))
             {
-                connection.Execute(sp_call, sp_params);
+                connection.Execute(sp_name, sp_params, commandType: CommandType.StoredProcedure);
                 success = sp_params.Get<bool>("o_success");
             }
             return success;

@@ -40,7 +40,7 @@ namespace Inventart.Controllers
             //var x = Request.Headers["Authorization"];
 
             List<dynamic> results = new List<dynamic>();
-            var sql = "SELECT * FROM fn_diagnostico_list_all(@i_tenant)";
+            var sql = "EXEC sp_diagnostico_list_all @i_tenant";
             DynamicParameters sql_params = new DynamicParameters(new { i_tenant = tenant });
             //
             using (var connection = new SqlConnection(_csp.ConnectionString))
@@ -64,13 +64,13 @@ namespace Inventart.Controllers
                     await file.CopyToAsync(ms);
                     byte[] fileBytes = ms.ToArray();
                     // save to database
+                    var sp_name = "sp_upload_file_diagnostico";
                     DynamicParameters sp_params = new DynamicParameters(new { i_guid = diagnostico, i_name = file.FileName, i_bytes = fileBytes });
-                    sp_params.Add("@o_file_guid", value: null, DbType.Guid, direction: ParameterDirection.Output);
-                    var sql = "EXEC sp_upload_file_diagnostico(@i_guid, @i_name, @i_bytes, @o_file_guid)";
+                    sp_params.Add("o_file_guid", value: null, DbType.Guid, direction: ParameterDirection.Output);
                     //
                     using (var connection = new SqlConnection(_csp.ConnectionString))
                     {
-                        connection.Execute(sql, sp_params);
+                        connection.Execute(sp_name, sp_params, commandType: CommandType.StoredProcedure);
                         file_guid = sp_params.Get<Guid>("o_file_guid");
                         // save to wwwroot if upload to database worked, future optimization after the non optimized process has been tested
                         // when a file is requested for stream we will check the disk and only download form database if teh files are not already available

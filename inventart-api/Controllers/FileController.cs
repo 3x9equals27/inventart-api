@@ -56,7 +56,7 @@ namespace Inventart.Controllers
 
             //WIP: get this in its own service and use a stored proc
             List<dynamic> results = new List<dynamic>();
-            var sql = "SELECT name, bytes FROM file WHERE guid = @guid";
+            var sql = "SELECT name, bytes FROM [file] WHERE guid = @guid";
 
             using (var connection = new SqlConnection(_csp.ConnectionString))
             {

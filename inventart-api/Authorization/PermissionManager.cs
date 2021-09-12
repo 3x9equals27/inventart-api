@@ -19,7 +19,7 @@ namespace Inventart.Authorization
                     return role.EqualsAny(Role.Curator, Role.Contributor, Role.Visitor);
 
                 case Permission.UploadFile:
-                    return role.EqualsAny(Role.Curator);
+                    return role.EqualsAny(Role.Curator, Role.Contributor);
 
                 case Permission.EditRoles:
                     return role.EqualsAny(Role.Curator);
