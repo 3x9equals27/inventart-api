@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Inventart.Authorization;
+using Inventart.Repos;
 using Inventart.Services.Singleton;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -7,10 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Inventart.Controllers
@@ -22,37 +20,31 @@ namespace Inventart.Controllers
         private readonly ILogger<DiagnosticController> _logger;
         private readonly IWebHostEnvironment _wenv;
         private readonly ConnectionStringProvider _csp;
+        private readonly DiagRepo _repo;
 
         public DiagnosticController(
             ILogger<DiagnosticController> logger,
             IWebHostEnvironment webHostEnvironment,
-            ConnectionStringProvider connectionStringProvider)
+            ConnectionStringProvider connectionStringProvider,
+            DiagRepo diagRepo)
         {
             _logger = logger;
             _wenv = webHostEnvironment;
             _csp = connectionStringProvider;
+            _repo = diagRepo;
         }
 
         [HttpGet("{tenant}/list-all")]
         [Requires(Permission.ListDiagnostic)]
         public async Task<IActionResult> Get([FromRoute] string tenant)
         {
-            //var x = Request.Headers["Authorization"];
-
-            List<dynamic> results = new List<dynamic>();
-            var sql = "EXEC sp_diagnostico_list_all @i_tenant";
-            DynamicParameters sql_params = new DynamicParameters(new { i_tenant = tenant });
-            //
-            using (var connection = new SqlConnection(_csp.ConnectionString))
-            {
-                results = (await connection.QueryAsync(sql, sql_params)).ToList();
-            }
+            List<dynamic> results = await _repo.ListAllDiagnostic(tenant);
             return Ok(results);
         }
 
         [HttpPost("upload")]
         [Requires(Permission.UploadFile)]
-        public async Task<IActionResult> OnPostUploadAsync([FromQuery] Guid diagnostico, IFormFile file)
+        public async Task<IActionResult> UploadFile([FromQuery] Guid diagnostico, IFormFile file)
         {
             Guid? file_guid = null;
             long size = file.Length;
@@ -64,18 +56,11 @@ namespace Inventart.Controllers
                     await file.CopyToAsync(ms);
                     byte[] fileBytes = ms.ToArray();
                     // save to database
-                    var sp_name = "sp_upload_file_diagnostico";
-                    DynamicParameters sp_params = new DynamicParameters(new { i_guid = diagnostico, i_name = file.FileName, i_bytes = fileBytes });
-                    sp_params.Add("o_file_guid", value: null, DbType.Guid, direction: ParameterDirection.Output);
-                    //
-                    using (var connection = new SqlConnection(_csp.ConnectionString))
-                    {
-                        connection.Execute(sp_name, sp_params, commandType: CommandType.StoredProcedure);
-                        file_guid = sp_params.Get<Guid>("o_file_guid");
-                        // save to wwwroot if upload to database worked, future optimization after the non optimized process has been tested
-                        // when a file is requested for stream we will check the disk and only download form database if teh files are not already available
-                        //FileIO.WriteAllBytes(Path.Combine(_wenv.WebRootPath, "nxz", $"{file_guid}.nxz"), fileBytes);
-                    }
+                    file_guid = await _repo.SaveFile(diagnostico, file.FileName, fileBytes);
+                    // save to wwwroot if upload to database worked, future optimization after the non optimized process has been tested
+                    // when a file is requested for stream we will check the disk and only download form database if teh files are not already available
+                    //FileIO.WriteAllBytes(Path.Combine(_wenv.WebRootPath, "nxz", $"{file_guid}.nxz"), fileBytes);
+                    
                 }
             }
 

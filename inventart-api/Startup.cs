@@ -94,6 +94,8 @@ namespace Inventart
             services.AddSingleton<EmailService>();
             services.AddSingleton<AuthRepo>();
             services.AddSingleton<UserRepo>();
+            services.AddSingleton<FileRepo>();
+            services.AddSingleton<DiagRepo>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
