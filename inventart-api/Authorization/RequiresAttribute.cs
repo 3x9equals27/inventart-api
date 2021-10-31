@@ -71,7 +71,7 @@ public class RequiresAttribute : Attribute, IAuthorizationFilter
             return;
 
         Guid userGuid = userToken.guid;
-        string tenant = context.HttpContext.GetRouteData()?.Values["tenant"]?.ToString() ?? DEFAULT_TENANT_CODE;
+        string tenant = context.HttpContext.GetRouteData()?.Values["tenant"]?.ToString() ?? DEFAULT_TENANT_CODE; //remove after adding "{tenant}/" to every endpoint that requires it
         string role = Task.Run(() => _repo.RoleOfUserTenant(userGuid, tenant)).Result; //can't do awaits here
 
         if (string.IsNullOrEmpty(role))

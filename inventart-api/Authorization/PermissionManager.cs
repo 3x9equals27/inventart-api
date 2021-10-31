@@ -12,6 +12,9 @@ namespace Inventart.Authorization
                 case Permission.ListDiagnostic:
                     return role.EqualsAny(Role.Curator, Role.Contributor, Role.Visitor, Role.Guest);
 
+                case Permission.CreateDiagnostic:
+                    return role.EqualsAny(Role.Curator, Role.Contributor);
+
                 case Permission.ListUserRole:
                     return role.EqualsAny(Role.Curator);
 

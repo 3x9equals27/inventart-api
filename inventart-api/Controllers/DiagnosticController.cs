@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Inventart.Authorization;
+using Inventart.Models.ControllerInputs;
 using Inventart.Repos;
 using Inventart.Services.Singleton;
 using Microsoft.AspNetCore.Hosting;
@@ -68,6 +69,22 @@ namespace Inventart.Controllers
             // Don't rely on or trust the FileName property without validation.
 
             return Ok(new { count = 1, size, file_guid });
+        }
+
+        [HttpPost("{tenant}/create")]
+        [Requires(Permission.CreateDiagnostic)]
+        public async Task<IActionResult> Create([FromRoute] string tenant, [FromBody] DiagnosticCreate diagnostic)
+        {
+            Guid? guid;
+            try
+            {
+                guid = await _repo.DiagnosticCreate(tenant, diagnostic);
+            } catch (Exception x)
+            {
+                //WIP: catch SQLException and check the error number and set distinct translatable error message for each case
+                return BadRequest(new { errorMessage123 = "WIP: set (t) error messages here, server:msg" });
+            }
+            return Ok(new { guid = guid });
         }
     }
 }

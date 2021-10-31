@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Inventart.Models.ControllerInputs;
 using Inventart.Services.Singleton;
 using System;
 using System.Collections.Generic;
@@ -44,6 +45,21 @@ namespace Inventart.Repos
                 file_guid = sp_params.Get<Guid>("o_file_guid");
             }
             return file_guid;
+        }
+        public async Task<Guid?> DiagnosticCreate(string tenant_code, DiagnosticCreate diagnostic)
+        {
+            Guid? diagnostic_guid = null;
+            // save to database
+            var sp_name = "sp_diagnostico_create";
+            DynamicParameters sp_params = new DynamicParameters(new { i_tenant = tenant_code, i_description = diagnostic.Description });
+            sp_params.Add("o_diagnostico_guid", value: null, DbType.Guid, direction: ParameterDirection.Output);
+            //
+            using (var connection = new SqlConnection(_csp.ConnectionString))
+            {
+                await connection.ExecuteAsync(sp_name, sp_params, commandType: CommandType.StoredProcedure);
+                diagnostic_guid = sp_params.Get<Guid>("o_diagnostico_guid");
+            }
+            return diagnostic_guid;
         }
     }
 }
