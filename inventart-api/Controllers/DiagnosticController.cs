@@ -82,7 +82,8 @@ namespace Inventart.Controllers
             } catch (Exception x)
             {
                 //WIP: catch SQLException and check the error number and set distinct translatable error message for each case
-                return BadRequest(new { errorMessage123 = "WIP: set (t) error messages here, server:msg" });
+                //return BadRequest(new { errorMessage123 = "WIP: set (t) error messages here, server:msg" });
+                return BadRequest("generic error creating new record" );
             }
             return Ok(new { guid = guid });
         }
