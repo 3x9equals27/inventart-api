@@ -10,19 +10,19 @@ using System.Threading.Tasks;
 
 namespace Inventart.Repos
 {
-    public class DiagRepo
+    public class PaintingRepo
     {
         private readonly ConnectionStringProvider _csp;
 
-        public DiagRepo(ConnectionStringProvider connectionStringProvider)
+        public PaintingRepo(ConnectionStringProvider connectionStringProvider)
         {
             _csp = connectionStringProvider;
         }
 
-        public async Task<List<dynamic>> ListAllDiagnostic(string tenant)
+        public async Task<List<dynamic>> ListAllPainting(string tenant)
         {
             List<dynamic> results = new List<dynamic>();
-            var sql = "EXEC sp_diagnostico_list_all @i_tenant";
+            var sql = "EXEC sp_painting_list_all @i_tenant";
             DynamicParameters sql_params = new DynamicParameters(new { i_tenant = tenant });
             //
             using (var connection = new SqlConnection(_csp.ConnectionString))
@@ -31,12 +31,12 @@ namespace Inventart.Repos
             }
             return results;
         }
-        public async Task<Guid?> SaveFile(Guid diagnostic, string fileName, byte[] fileBytes)
+        public async Task<Guid?> SaveFile(Guid painting, string fileName, byte[] fileBytes)
         {
             Guid? file_guid = null;
             // save to database
-            var sp_name = "sp_upload_file_diagnostico";
-            DynamicParameters sp_params = new DynamicParameters(new { i_guid = diagnostic, i_name = fileName, i_bytes = fileBytes });
+            var sp_name = "sp_upload_file_painting";
+            DynamicParameters sp_params = new DynamicParameters(new { i_guid = painting, i_name = fileName, i_bytes = fileBytes });
             sp_params.Add("o_file_guid", value: null, DbType.Guid, direction: ParameterDirection.Output);
             //
             using (var connection = new SqlConnection(_csp.ConnectionString))
@@ -46,20 +46,20 @@ namespace Inventart.Repos
             }
             return file_guid;
         }
-        public async Task<Guid?> DiagnosticCreate(string tenant_code, DiagnosticCreate diagnostic)
+        public async Task<Guid?> PaintingCreate(string tenant_code, PaintingCreate painting)
         {
-            Guid? diagnostic_guid = null;
+            Guid? painting_guid = null;
             // save to database
-            var sp_name = "sp_diagnostico_create";
-            DynamicParameters sp_params = new DynamicParameters(new { i_tenant = tenant_code, i_description = diagnostic.Description });
-            sp_params.Add("o_diagnostico_guid", value: null, DbType.Guid, direction: ParameterDirection.Output);
+            var sp_name = "sp_painting_create";
+            DynamicParameters sp_params = new DynamicParameters(new { i_tenant = tenant_code, i_description = painting.Description });
+            sp_params.Add("o_painting_guid", value: null, DbType.Guid, direction: ParameterDirection.Output);
             //
             using (var connection = new SqlConnection(_csp.ConnectionString))
             {
                 await connection.ExecuteAsync(sp_name, sp_params, commandType: CommandType.StoredProcedure);
-                diagnostic_guid = sp_params.Get<Guid>("o_diagnostico_guid");
+                painting_guid = sp_params.Get<Guid>("o_painting_guid");
             }
-            return diagnostic_guid;
+            return painting_guid;
         }
     }
 }

@@ -9,10 +9,10 @@ namespace Inventart.Authorization
         {
             switch (permission)
             {
-                case Permission.ListDiagnostic:
+                case Permission.ListPainting:
                     return role.EqualsAny(Role.Curator, Role.Contributor, Role.Visitor, Role.Guest);
 
-                case Permission.CreateDiagnostic:
+                case Permission.CreatePainting:
                     return role.EqualsAny(Role.Curator, Role.Contributor);
 
                 case Permission.ListUserRole:

@@ -16,36 +16,36 @@ namespace Inventart.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class DiagnosticController : ControllerBase
+    public class PaintingController : ControllerBase
     {
-        private readonly ILogger<DiagnosticController> _logger;
+        private readonly ILogger<PaintingController> _logger;
         private readonly IWebHostEnvironment _wenv;
         private readonly ConnectionStringProvider _csp;
-        private readonly DiagRepo _repo;
+        private readonly PaintingRepo _repo;
 
-        public DiagnosticController(
-            ILogger<DiagnosticController> logger,
+        public PaintingController(
+            ILogger<PaintingController> logger,
             IWebHostEnvironment webHostEnvironment,
             ConnectionStringProvider connectionStringProvider,
-            DiagRepo diagRepo)
+            PaintingRepo paintingRepo)
         {
             _logger = logger;
             _wenv = webHostEnvironment;
             _csp = connectionStringProvider;
-            _repo = diagRepo;
+            _repo = paintingRepo;
         }
 
         [HttpGet("{tenant}/list-all")]
-        [Requires(Permission.ListDiagnostic)]
+        [Requires(Permission.ListPainting)]
         public async Task<IActionResult> Get([FromRoute] string tenant)
         {
-            List<dynamic> results = await _repo.ListAllDiagnostic(tenant);
+            List<dynamic> results = await _repo.ListAllPainting(tenant);
             return Ok(results);
         }
 
         [HttpPost("upload")]
         [Requires(Permission.UploadFile)]
-        public async Task<IActionResult> UploadFile([FromQuery] Guid diagnostico, IFormFile file)
+        public async Task<IActionResult> UploadFile([FromQuery] Guid painting, IFormFile file)
         {
             Guid? file_guid = null;
             long size = file.Length;
@@ -57,7 +57,7 @@ namespace Inventart.Controllers
                     await file.CopyToAsync(ms);
                     byte[] fileBytes = ms.ToArray();
                     // save to database
-                    file_guid = await _repo.SaveFile(diagnostico, file.FileName, fileBytes);
+                    file_guid = await _repo.SaveFile(painting, file.FileName, fileBytes);
                     // save to wwwroot if upload to database worked, future optimization after the non optimized process has been tested
                     // when a file is requested for stream we will check the disk and only download form database if teh files are not already available
                     //FileIO.WriteAllBytes(Path.Combine(_wenv.WebRootPath, "nxz", $"{file_guid}.nxz"), fileBytes);
@@ -72,13 +72,13 @@ namespace Inventart.Controllers
         }
 
         [HttpPost("{tenant}/create")]
-        [Requires(Permission.CreateDiagnostic)]
-        public async Task<IActionResult> Create([FromRoute] string tenant, [FromBody] DiagnosticCreate diagnostic)
+        [Requires(Permission.CreatePainting)]
+        public async Task<IActionResult> Create([FromRoute] string tenant, [FromBody] PaintingCreate painting)
         {
             Guid? guid;
             try
             {
-                guid = await _repo.DiagnosticCreate(tenant, diagnostic);
+                guid = await _repo.PaintingCreate(tenant, painting);
             } catch (Exception x)
             {
                 //WIP: catch SQLException and check the error number and set distinct translatable error message for each case

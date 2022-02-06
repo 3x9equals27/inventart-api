@@ -57,7 +57,7 @@ namespace Inventart.Controllers
             return Ok(new { UserToken = result, TokenString = $"Bearer {token}" });
         }
 
-        [Requires(Permission.ListDiagnostic)]
+        [Requires(Permission.ListPainting)]
         [HttpPost("tryauth")]
         public async Task<IActionResult> TryAuth()
         {

@@ -35,7 +35,7 @@ namespace Inventart.Controllers
             _repo = fileRepo;
         }
 
-        [Requires(Permission.ListDiagnostic)]
+        [Requires(Permission.ListPainting)]
         [HttpGet("link/{fileGuid}")]
         public async Task<IActionResult> GetLinkForFile(Guid fileGuid)
         {

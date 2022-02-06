@@ -1,6 +1,6 @@
 ﻿namespace Inventart.Models.ControllerInputs
 {
-    public class DiagnosticCreate
+    public class PaintingCreate
     {
         public string Description { get; set; }
     }
