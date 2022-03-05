@@ -67,11 +67,11 @@ namespace Inventart.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(AuthRegister input)
         {
-            if (string.IsNullOrWhiteSpace(input.Email)) return BadRequest("Empty email");
-            if (string.IsNullOrWhiteSpace(input.Password)) return BadRequest("Empty password");
-            if (string.IsNullOrWhiteSpace(input.PasswordRepeat)) return BadRequest("Empty password");
-            if (string.IsNullOrWhiteSpace(input.FirstName)) return BadRequest("Empty first name");
-            if (string.IsNullOrWhiteSpace(input.LastName)) return BadRequest("Empty last name");
+            if (string.IsNullOrWhiteSpace(input.Email)) return BadRequest("empty.email");
+            if (string.IsNullOrWhiteSpace(input.Password)) return BadRequest("empty.password");
+            if (string.IsNullOrWhiteSpace(input.PasswordRepeat)) return BadRequest("empty.password");
+            if (string.IsNullOrWhiteSpace(input.FirstName)) return BadRequest("empty.first.name");
+            if (string.IsNullOrWhiteSpace(input.LastName)) return BadRequest("empty.last.name");
 
             // validate email and return BadRequest if it does not conform
             try
@@ -80,15 +80,15 @@ namespace Inventart.Controllers
             }
             catch
             {
-                return BadRequest("Invalid email");
+                return BadRequest("invalid.email");
             }
 
             // validate password and return BadRequest if it does not conform
             if (input.Password != input.PasswordRepeat)
-                return BadRequest("passwords don't match");
+                return BadRequest("passwords.dont.match");
 
             if (input.Password.Length < 4)
-                return BadRequest("password too small");
+                return BadRequest("password.too.small");
 
             // hash the password
             string passwordHash = bCrypt.HashPassword(input.Password);
@@ -234,15 +234,15 @@ namespace Inventart.Controllers
         [HttpPost("password-reset-step2b")]
         public async Task<IActionResult> PasswordResetStep2b(AuthPasswordReset input)
         {
-            if (string.IsNullOrWhiteSpace(input.Password)) return BadRequest("Empty password");
-            if (string.IsNullOrWhiteSpace(input.PasswordRepeat)) return BadRequest("Empty password");
+            if (string.IsNullOrWhiteSpace(input.Password)) return BadRequest("empty.password");
+            if (string.IsNullOrWhiteSpace(input.PasswordRepeat)) return BadRequest("empty.password");
 
             // validate password and return BadRequest if it does not conform
             if (input.Password != input.PasswordRepeat)
-                return BadRequest("passwords don't match");
+                return BadRequest("passwords.dont.match");
 
             if (input.Password.Length < 4)
-                return BadRequest("password too small");
+                return BadRequest("password.too.small");
 
             // hash the password
             string passwordHash = bCrypt.HashPassword(input.Password);
