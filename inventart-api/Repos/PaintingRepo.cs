@@ -51,7 +51,12 @@ namespace Inventart.Repos
             Guid? painting_guid = null;
             // save to database
             var sp_name = "sp_painting_create";
-            DynamicParameters sp_params = new DynamicParameters(new { i_tenant = tenant_code, i_description = painting.Description });
+            DynamicParameters sp_params = new DynamicParameters(new { 
+                i_tenant = tenant_code,
+                i_name = painting.Name,
+                i_author = painting.Author,
+                i_description = painting.Description
+            });
             sp_params.Add("o_painting_guid", value: null, DbType.Guid, direction: ParameterDirection.Output);
             //
             using (var connection = new SqlConnection(_csp.ConnectionString))
