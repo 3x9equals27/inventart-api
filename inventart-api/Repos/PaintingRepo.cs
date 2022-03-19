@@ -46,12 +46,13 @@ namespace Inventart.Repos
             }
             return file_guid;
         }
-        public async Task<Guid?> PaintingCreate(string tenant_code, PaintingCreate painting)
+        public async Task<Guid?> PaintingCreate(string tenant_code, PaintingDto painting)
         {
             Guid? painting_guid = null;
             // save to database
             var sp_name = "sp_painting_create";
-            DynamicParameters sp_params = new DynamicParameters(new { 
+            DynamicParameters sp_params = new DynamicParameters(new
+            {
                 i_tenant = tenant_code,
                 i_name = painting.Name,
                 i_author = painting.Author,
@@ -65,6 +66,24 @@ namespace Inventart.Repos
                 painting_guid = sp_params.Get<Guid>("o_painting_guid");
             }
             return painting_guid;
+        }
+        public async Task PaintingUpdate(string tenant_code, Guid painting_guid, PaintingDto painting)
+        {
+            // save to database
+            var sp_name = "sp_painting_update";
+            DynamicParameters sp_params = new DynamicParameters(new
+            {
+                i_tenant = tenant_code,
+                i_guid = painting_guid,
+                i_name = painting.Name,
+                i_author = painting.Author,
+                i_description = painting.Description
+            });
+            //
+            using (var connection = new SqlConnection(_csp.ConnectionString))
+            {
+                await connection.ExecuteAsync(sp_name, sp_params, commandType: CommandType.StoredProcedure);
+            }
         }
     }
 }

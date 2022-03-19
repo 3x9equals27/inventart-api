@@ -74,7 +74,7 @@ namespace Inventart.Controllers
 
         [HttpPost("{tenant}/create")]
         [Requires(Permission.CreatePainting)]
-        public async Task<IActionResult> Create([FromRoute] string tenant, [FromBody] PaintingCreate painting)
+        public async Task<IActionResult> Create([FromRoute] string tenant, [FromBody] PaintingDto painting)
         {
             if (string.IsNullOrWhiteSpace(painting.Name)) return BadRequest("empty.name");
             if (string.IsNullOrWhiteSpace(painting.Author)) return BadRequest("empty.author");
@@ -86,15 +86,39 @@ namespace Inventart.Controllers
             }
             catch (SqlException x)
             {
-                if(x.Number == 2627) 
+                if (x.Number == 2627)
                     return BadRequest("duplicated.name.author");
                 return BadRequest("db.error");
             }
             catch (Exception x)
             {
-                return BadRequest("generic" );
+                return BadRequest("generic");
             }
             return Ok(new { guid = guid });
+        }
+
+        [HttpPost("{tenant}/update/{guid}")]
+        [Requires(Permission.CreatePainting)]
+        public async Task<IActionResult> Update([FromRoute] string tenant, [FromRoute] Guid guid, [FromBody] PaintingDto painting)
+        {
+            if (string.IsNullOrWhiteSpace(painting.Name)) return BadRequest("empty.name");
+            if (string.IsNullOrWhiteSpace(painting.Author)) return BadRequest("empty.author");
+
+            try
+            {
+                await _repo.PaintingUpdate(tenant, guid, painting);
+            }
+            catch (SqlException x)
+            {
+                if (x.Number == 2627)
+                    return BadRequest("duplicated.name.author");
+                return BadRequest("db.error");
+            }
+            catch (Exception x)
+            {
+                return BadRequest("generic");
+            }
+            return Ok();
         }
     }
 }
