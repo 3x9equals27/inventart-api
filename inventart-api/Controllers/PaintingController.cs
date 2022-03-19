@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -75,15 +76,23 @@ namespace Inventart.Controllers
         [Requires(Permission.CreatePainting)]
         public async Task<IActionResult> Create([FromRoute] string tenant, [FromBody] PaintingCreate painting)
         {
+            if (string.IsNullOrWhiteSpace(painting.Name)) return BadRequest("empty.name");
+            if (string.IsNullOrWhiteSpace(painting.Author)) return BadRequest("empty.author");
+
             Guid? guid;
             try
             {
                 guid = await _repo.PaintingCreate(tenant, painting);
-            } catch (Exception x)
+            }
+            catch (SqlException x)
             {
-                //WIP: catch SQLException and check the error number and set distinct translatable error message for each case
-                //return BadRequest(new { errorMessage123 = "WIP: set (t) error messages here, server:msg" });
-                return BadRequest("generic error creating new record" );
+                if(x.Number == 2627) 
+                    return BadRequest("duplicated.name.author");
+                return BadRequest("db.error");
+            }
+            catch (Exception x)
+            {
+                return BadRequest("generic" );
             }
             return Ok(new { guid = guid });
         }
