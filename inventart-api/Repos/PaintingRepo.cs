@@ -19,18 +19,19 @@ namespace Inventart.Repos
             _csp = connectionStringProvider;
         }
 
-        public async Task<List<dynamic>> ListAllPainting(string tenant)
+        public async Task<List<dynamic>> ListAll(string tenant)
         {
             List<dynamic> results = new List<dynamic>();
-            var sql = "EXEC sp_painting_list_all @i_tenant";
+            var sp_name = "sp_painting_list_all";
             DynamicParameters sql_params = new DynamicParameters(new { i_tenant = tenant });
             //
             using (var connection = new SqlConnection(_csp.ConnectionString))
             {
-                results = (await connection.QueryAsync(sql, sql_params)).ToList();
+                results = (await connection.QueryAsync(sp_name, sql_params, commandType: CommandType.StoredProcedure)).ToList();
             }
             return results;
         }
+
         public async Task<Guid?> SaveFile(Guid painting, string fileName, byte[] fileBytes)
         {
             Guid? file_guid = null;
@@ -46,7 +47,8 @@ namespace Inventart.Repos
             }
             return file_guid;
         }
-        public async Task<Guid?> PaintingCreate(string tenant_code, PaintingDto painting)
+
+        public async Task<Guid?> Create(string tenant_code, PaintingDto painting)
         {
             Guid? painting_guid = null;
             // save to database
@@ -67,7 +69,7 @@ namespace Inventart.Repos
             }
             return painting_guid;
         }
-        public async Task PaintingUpdate(string tenant_code, Guid painting_guid, PaintingDto painting)
+        public async Task Update(string tenant_code, Guid painting_guid, PaintingDto painting)
         {
             // save to database
             var sp_name = "sp_painting_update";
@@ -85,5 +87,23 @@ namespace Inventart.Repos
                 await connection.ExecuteAsync(sp_name, sp_params, commandType: CommandType.StoredProcedure);
             }
         }
+
+        public async Task<dynamic> SelectSingle(string tenant, Guid painting_guid)
+        {
+            List<dynamic> results = new List<dynamic>();
+            var sp_name = "sp_painting_select_single";
+            DynamicParameters sql_params = new DynamicParameters(new
+            {
+                i_tenant = tenant,
+                i_guid = painting_guid
+            });
+            
+            using (var connection = new SqlConnection(_csp.ConnectionString))
+            {
+                results = (await connection.QueryAsync(sp_name, sql_params, commandType: CommandType.StoredProcedure)).ToList();
+            }
+            return results.FirstOrDefault();
+        }
+
     }
 }

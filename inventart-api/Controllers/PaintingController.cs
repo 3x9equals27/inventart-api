@@ -40,7 +40,7 @@ namespace Inventart.Controllers
         [Requires(Permission.ListPainting)]
         public async Task<IActionResult> Get([FromRoute] string tenant)
         {
-            List<dynamic> results = await _repo.ListAllPainting(tenant);
+            List<dynamic> results = await _repo.ListAll(tenant);
             return Ok(results);
         }
 
@@ -82,7 +82,7 @@ namespace Inventart.Controllers
             Guid? guid;
             try
             {
-                guid = await _repo.PaintingCreate(tenant, painting);
+                guid = await _repo.Create(tenant, painting);
             }
             catch (SqlException x)
             {
@@ -97,6 +97,14 @@ namespace Inventart.Controllers
             return Ok(new { guid = guid });
         }
 
+        [HttpGet("{tenant}/select/{guid}")]
+        [Requires(Permission.ListPainting)]
+        public async Task<IActionResult> SelectSingle([FromRoute] string tenant, [FromRoute] Guid guid)
+        {
+            dynamic painting = await _repo.SelectSingle(tenant, guid);
+            return Ok(painting);
+        }
+
         [HttpPost("{tenant}/update/{guid}")]
         [Requires(Permission.CreatePainting)]
         public async Task<IActionResult> Update([FromRoute] string tenant, [FromRoute] Guid guid, [FromBody] PaintingDto painting)
@@ -106,7 +114,7 @@ namespace Inventart.Controllers
 
             try
             {
-                await _repo.PaintingUpdate(tenant, guid, painting);
+                await _repo.Update(tenant, guid, painting);
             }
             catch (SqlException x)
             {
