@@ -23,11 +23,11 @@ namespace Inventart.Repos
         {
             List<dynamic> results = new List<dynamic>();
             var sp_name = "sp_painting_list_all";
-            DynamicParameters sql_params = new DynamicParameters(new { i_tenant = tenant });
+            DynamicParameters sp_params = new DynamicParameters(new { i_tenant = tenant });
             //
             using (var connection = new SqlConnection(_csp.ConnectionString))
             {
-                results = (await connection.QueryAsync(sp_name, sql_params, commandType: CommandType.StoredProcedure)).ToList();
+                results = (await connection.QueryAsync(sp_name, sp_params, commandType: CommandType.StoredProcedure)).ToList();
             }
             return results;
         }
@@ -92,17 +92,32 @@ namespace Inventart.Repos
         {
             List<dynamic> results = new List<dynamic>();
             var sp_name = "sp_painting_select_single";
-            DynamicParameters sql_params = new DynamicParameters(new
+            DynamicParameters sp_params = new DynamicParameters(new
             {
                 i_tenant = tenant,
                 i_guid = painting_guid
             });
-            
+
             using (var connection = new SqlConnection(_csp.ConnectionString))
             {
-                results = (await connection.QueryAsync(sp_name, sql_params, commandType: CommandType.StoredProcedure)).ToList();
+                results = (await connection.QueryAsync(sp_name, sp_params, commandType: CommandType.StoredProcedure)).ToList();
             }
             return results.FirstOrDefault();
+        }
+        public async Task Delete(string tenant, Guid painting_guid)
+        {
+            List<dynamic> results = new List<dynamic>();
+            var sp_name = "sp_painting_delete";
+            DynamicParameters sp_params = new DynamicParameters(new
+            {
+                i_tenant = tenant,
+                i_guid = painting_guid
+            });
+
+            using (var connection = new SqlConnection(_csp.ConnectionString))
+            {
+                await connection.ExecuteAsync(sp_name, sp_params, commandType: CommandType.StoredProcedure);
+            }
         }
 
     }

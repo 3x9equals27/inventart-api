@@ -128,5 +128,12 @@ namespace Inventart.Controllers
             }
             return Ok();
         }
+        [HttpPost("{tenant}/delete/{guid}")]
+        [Requires(Permission.CreatePainting)]
+        public async Task<IActionResult> Delete([FromRoute] string tenant, [FromRoute] Guid guid)
+        {
+            await _repo.Delete(tenant, guid);
+            return Ok();
+        }
     }
 }

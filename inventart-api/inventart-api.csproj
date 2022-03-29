@@ -52,7 +52,7 @@
 
   <ItemGroup>
     <None Update="inventart-api.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
